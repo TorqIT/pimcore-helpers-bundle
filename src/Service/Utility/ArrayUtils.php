@@ -13,7 +13,7 @@ class ArrayUtils
      * @param array $body
      * @return AbstractObject|AbstractData
      */
-    public static function setDataByArray(AbstractObject $object, array $body): AbstractObject
+    public function setDataByArray(AbstractObject $object, array $body): AbstractObject
     {
         foreach ($body as $key => $value) {
             $setter = "set" . $key;
@@ -23,7 +23,7 @@ class ArrayUtils
     }
 
     /** @param string|string[] $key */
-    public static function safeVal(array|string $key, array $array)
+    public function safeVal(array|string $key, array $array)
     {
         if (is_array($key)) {
             if (empty($key)) {
@@ -43,36 +43,36 @@ class ArrayUtils
     }
 
     /** @param string|string[] $key */
-    public static function safeDate(array|string $key, array $array)
+    public function safeDate(array|string $key, array $array)
     {
         $val = self::safeVal($key, $array);
         return $val ? Carbon::parse($val) : null;
     }
 
-    public static function safeInt(array|string $key, array $array)
+    public function safeInt(array|string $key, array $array)
     {
         $val = self::safeVal($key, $array);
         return empty($val) ? null : intval($val);
     }
 
-    public static function safeFloat(array|string $key, array $array)
+    public function safeFloat(array|string $key, array $array)
     {
         $val = self::safeVal($key, $array);
         return empty($val) ? null : floatval($val);
     }
 
-    public static function getFirstItemSafely(?array $array)
+    public function getFirstItemSafely(?array $array)
     {
         return ($array && count($array) > 0) ? $array[0] : null;
     }
 
-    public static function findInArray(callable $callable, array $array)
+    public function findInArray(callable $callable, array $array)
     {
         $index = self::findIndex($callable, $array);
         return $index != -1 ? $array[$index] : null;
     }
 
-    public static function findIndex(callable $callable, array $array)
+    public function findIndex(callable $callable, array $array)
     {
         foreach($array as $index => $option)
         {
