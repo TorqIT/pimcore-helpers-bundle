@@ -1,5 +1,0 @@
-torq_pimcore_helpers:
-    resource: "@TorqPimcoreHelpersBundle/src/Controller/"
-    type:     annotation
-    prefix:   /
-

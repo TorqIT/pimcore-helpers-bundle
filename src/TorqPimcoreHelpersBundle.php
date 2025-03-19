@@ -14,12 +14,4 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreB
     {
         return \dirname(__DIR__);
     }
-
-    public function getJsPaths(): array
-    {
-        return [
-            '/bundles/torqpimcorehelpers/js/pimcore/startup.js'
-        ];
-    }
-
 }
