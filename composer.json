@@ -1,6 +1,7 @@
 {
     "name": "torq/pimcore-helpers-bundle",
     "type": "pimcore-bundle",
+    "license": "GNU General Public License v3",
     "version": "1.0.0",
     "require": {
         "pimcore/pimcore": "^11.0"
