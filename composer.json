@@ -7,12 +7,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Torq\\TorqAzureUserOAuthBundle\\": "src"
+            "Torq\\PimcoreHelpersBundle\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Torq\\TorqAzureUserOAuthBundle\\Tests\\": "tests/"
+            "Torq\\PimcoreHelpersBundle\\Tests\\": "tests/"
         }
     },
     "extra": {
