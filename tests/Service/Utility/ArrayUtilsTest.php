@@ -22,7 +22,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => "My Value"
         ];
 
-        $this->assertEquals("My Value", $this->arrayUtils->safeVal("test", $payload));
+        $this->assertEquals("My Value", $this->arrayUtils->get("test", $payload));
     }
 
     public function testNullOnMissingKey()
@@ -31,7 +31,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => "My Value"
         ];
 
-        $this->assertNull($this->arrayUtils->safeVal("other", $payload));
+        $this->assertNull($this->arrayUtils->get("other", $payload));
     }
 
     public function testNestedKey()
@@ -44,7 +44,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             ]
         ];
 
-        $this->assertEquals("My Value", $this->arrayUtils->safeVal(["test", "inner", "bottom"], $payload));
+        $this->assertEquals("My Value", $this->arrayUtils->get(["test", "inner", "bottom"], $payload));
     }
 
     public function testNullOnMissingNestedKey()
@@ -53,7 +53,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => []
         ];
 
-        $this->assertNull($this->arrayUtils->safeVal(["test", "inner", "bottom"], $payload));
+        $this->assertNull($this->arrayUtils->get(["test", "inner", "bottom"], $payload));
     }
 
     public function testNullOnWrongTypeKey()
@@ -62,7 +62,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => "haha"
         ];
 
-        $this->assertNull($this->arrayUtils->safeVal(["test", "inner", "bottom"], $payload));
+        $this->assertNull($this->arrayUtils->get(["test", "inner", "bottom"], $payload));
     }
 
     public function testThrowExceptionOnEmptyKeyList()
@@ -76,7 +76,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
         ];
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->arrayUtils->safeVal([], $payload);
+        $this->arrayUtils->get([], $payload);
     }
 
     public function testGetNullIntFromEmptyString()
@@ -85,7 +85,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => ""
         ];
 
-        $this->assertNull($this->arrayUtils->safeInt("test", $payload));
+        $this->assertNull($this->arrayUtils->getInt("test", $payload));
     }
 
     public function testGetNullFloatFromEmptyString()
@@ -94,7 +94,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => ""
         ];
 
-        $this->assertNull($this->arrayUtils->safeFloat("test", $payload));
+        $this->assertNull($this->arrayUtils->getFloat("test", $payload));
     }
 
     public function testGetIntFromString()
@@ -103,7 +103,7 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => "12"
         ];
 
-        $this->assertEquals(12, $this->arrayUtils->safeInt("test", $payload));
+        $this->assertEquals(12, $this->arrayUtils->getInt("test", $payload));
     }
 
     public function testGetFloatFromString()
@@ -112,6 +112,6 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
             "test" => "12.34"
         ];
 
-        $this->assertEquals(12.34, $this->arrayUtils->safeFloat("test", $payload));
+        $this->assertEquals(12.34, $this->arrayUtils->getFloat("test", $payload));
     }
 }
