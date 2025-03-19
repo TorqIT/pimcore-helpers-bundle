@@ -18,27 +18,17 @@ class FolderRepository
         return DataObject\Folder::getByPath($path, $options);
     }
 
-    public function createDataObjectFolder(string $path, array $options = []): DataObject\Folder
+    public function getOrCreateDataObjectFolder(string $path, array $options = [])
     {
         return DataObject\Service::createFolderByPath($path, $options);
     }
 
-    public function getOrCreateDataObjectFolder(string $path)
+    public function getAssetFolder(string $path, array $options = []): ?Asset\Folder
     {
-        return DataObject\Folder::getByPath($path) ?? DataObject\Service::createFolderByPath($path);
+        return Asset\Folder::getByPath($path, $options);
     }
 
-    public function getOrCreateAssetFolder(string $path): Asset\Folder
-    {
-        return $this->getAssetFolder($path) ?? $this->createAssetFolder($path);
-    }
-
-    public function getAssetFolder(string $path): ?Asset\Folder
-    {
-        return Asset\Folder::getByPath($path);
-    }
-
-    public function createAssetFolder(string $path, array $options = []): Asset\Folder
+    public function getOrCreateAssetFolder(string $path, array $options = []): Asset\Folder
     {
         return Asset\Service::createFolderByPath($path, $options);
     }
@@ -48,7 +38,7 @@ class FolderRepository
         return Document\Folder::getByPath($path, $options);
     }
 
-    public function createDocumentFolder(string $path, array $options = []): Document\Folder
+    public function getOrCreateDocumentFolder(string $path, array $options = []): Document\Folder
     {
         return Document\Service::createFolderByPath($path, $options);
     }
