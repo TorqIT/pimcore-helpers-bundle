@@ -50,6 +50,36 @@ class ArrayUtils
         return empty($val) ? null : floatval($val);
     }
 
+    /**
+     * @param array $array of type `item`
+     * @param callable $fn with signature fn(item): bool
+     * @return bool
+     */
+    public function any(array $array, callable $fn): bool
+    {
+        foreach ($array as $key => $value) {
+            if ($fn($value, $key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param array $array of type `item`
+     * @param callable $fn with signature fn(item, key?): bool
+     * @return bool
+     */
+    public function all(array $array, callable $fn): bool
+    {
+        foreach ($array as $key => $value) {
+            if (!$fn($value, $key)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function findInArray(callable $callable, ?array $array)
     {
         $index = self::findIndex($callable, $array);

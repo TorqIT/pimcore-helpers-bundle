@@ -146,4 +146,26 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
     {
         $this->assertNull($this->arrayUtils->findInArray(fn(array $a) => $a["id"] == 2, null));
     }
+
+    public function testAllChecksAllItems()
+    {
+        $this->assertTrue($this->arrayUtils->all([2, 4, 6], fn(int $item) => $item % 2 == 0));
+        $this->assertFalse($this->arrayUtils->all([2, 4, 7], fn(int $item) => $item % 2 == 0));
+    }
+
+    public function testAnyChecksAnyItems()
+    {
+        $this->assertTrue($this->arrayUtils->any([1, 3, 6], fn(int $item) => $item % 2 == 0));
+        $this->assertFalse($this->arrayUtils->any([1, 3, 5], fn(int $item) => $item % 2 == 0));
+    }
+
+    public function testAnyReturnsFalseOnEmpty()
+    {
+        $this->assertFalse($this->arrayUtils->any([], fn(int $item) => $item % 2 == 0));
+    }
+
+    public function testAllReturnsTrueOnEmpty()
+    {
+        $this->assertTrue($this->arrayUtils->all([], fn(int $item) => $item % 2 == 0));
+    }
 }
