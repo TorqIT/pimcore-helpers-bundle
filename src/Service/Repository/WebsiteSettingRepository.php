@@ -4,7 +4,7 @@ namespace Torq\PimcoreHelpersBundle\Service\Repository;
 
 use Pimcore\Model\WebsiteSetting;
 
-abstract class WebsiteSettingRepository
+class WebsiteSettingRepository
 {
     public function create(string $name, string $type, mixed $data, bool $save = true)
     {
