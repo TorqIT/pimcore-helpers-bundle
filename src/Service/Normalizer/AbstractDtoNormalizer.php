@@ -12,15 +12,15 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
     {
     }
 
-    /** @param mixed|array $asset */
-    public function toDto(mixed $asset)
+    /** @param mixed|array $object */
+    public function toDto(mixed $object)
     {
-        if (!$asset) {
+        if (!$object) {
             return null;
-        } elseif (is_array($asset)) {
-            return array_map([$this, 'convertToDto'], $asset);
+        } elseif (is_array($object)) {
+            return array_map([$this, 'convertToDto'], $object);
         } else {
-            return $this->convertToDto($asset);
+            return $this->convertToDto($object);
         }
     }
 
