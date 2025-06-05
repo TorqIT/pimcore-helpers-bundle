@@ -18,13 +18,13 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
         if (!$asset) {
             return null;
         } elseif (is_array($asset)) {
-            return array_map([$this, '_toDto'], $asset);
+            return array_map([$this, 'convertToDto'], $asset);
         } else {
-            return $this->_toDto($asset);
+            return $this->convertToDto($asset);
         }
     }
 
-    abstract protected function _toDto(mixed $object);
+    abstract protected function convertToDto(mixed $object);
 
     protected function validateObjectType(mixed $object, ?string $format = null)
     {
