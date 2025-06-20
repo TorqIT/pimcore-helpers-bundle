@@ -55,7 +55,7 @@ class ArrayUtils
      * @param callable $fn with signature fn(item): bool
      * @return array{0: mixed|null, 1: array} the first item matched by `fn` (or null) and the array with that item removed (or not).
      */
-    public function pop(array $array, callable $fn): array
+    public function findAndRemove(array $array, callable $fn): array
     {
         if (($index = $this->findIndex($fn, $array)) !== -1) {
             $item = $array[$index];
