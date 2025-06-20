@@ -59,7 +59,7 @@ class ArrayUtils
     {
         if (($index = $this->findIndex($fn, $array)) !== -1) {
             $item = $array[$index];
-            $array = array_slice($array, $index, 1);
+            array_splice($array, $index, 1);
             return [$item, $array];
         } else {
             return [null, $array];
