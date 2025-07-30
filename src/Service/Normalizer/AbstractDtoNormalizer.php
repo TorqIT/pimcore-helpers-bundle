@@ -2,6 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
+use ArrayObject;
 use InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -38,7 +39,7 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
         }
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = [])
+    public function normalize(mixed $object, ?string $format = null, array $context = []): ArrayObject|array|string|int|float|bool|null
     {
         $dto = $this->toDto($object, $format, $context);
         if (is_array($dto)) {
