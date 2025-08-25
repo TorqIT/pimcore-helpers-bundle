@@ -19,7 +19,7 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
         if (!$object) {
             return null;
         } elseif (is_array($object)) {
-            return array_map([$this, 'convertToDto'], $object);
+            return array_map(fn($o) => $this->convertToDto($o, $format, $context), $object);
         } else {
             return $this->convertToDto($object, $format, $context);
         }
@@ -34,7 +34,7 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
                 'object of type ' .
                     get_debug_type($object) .
                     ' must one of the following types: ' .
-                    implode(', ', $this->getSupportedTypes($format))
+                    implode(', ', array_keys($this->getSupportedTypes($format)))
             );
         }
     }
