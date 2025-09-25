@@ -13,6 +13,12 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
     {
     }
 
+    abstract protected function convertToDto(mixed $object, ?string $format = null, array $context = []);
+
+    abstract public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool;
+
+    abstract public function getSupportedTypes(?string $format): array;
+
     /** @param mixed|array $object */
     public function toDto(mixed $object, ?string $format = null, array $context = [])
     {
@@ -22,20 +28,6 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
             return array_map(fn($o) => $this->convertToDto($o, $format, $context), $object);
         } else {
             return $this->convertToDto($object, $format, $context);
-        }
-    }
-
-    abstract protected function convertToDto(mixed $object, ?string $format = null, array $context = []);
-
-    protected function validateObjectType(mixed $object, ?string $format = null, array $context = [])
-    {
-        if ($object !== null && !$this->supportsNormalization($object, $format)) {
-            throw new InvalidArgumentException(
-                'object of type ' .
-                    get_debug_type($object) .
-                    ' must one of the following types: ' .
-                    implode(', ', array_keys($this->getSupportedTypes($format)))
-            );
         }
     }
 
@@ -49,6 +41,18 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
         } else {
             throw new InvalidArgumentException(
                 'object of type: ' . get_debug_type($object) . ' must be either scalar, an object, or an array'
+            );
+        }
+    }
+
+    protected function validateObjectType(mixed $object, ?string $format = null, array $context = [])
+    {
+        if ($object !== null && !$this->supportsNormalization($object, $format)) {
+            throw new InvalidArgumentException(
+                'object of type ' .
+                    get_debug_type($object) .
+                    ' must one of the following types: ' .
+                    implode(', ', array_keys($this->getSupportedTypes($format)))
             );
         }
     }
