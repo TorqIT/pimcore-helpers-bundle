@@ -1,6 +1,6 @@
 <?php
 
-namespace Torq\PimcoreHelpersBundle\Service\Repository;
+namespace Torq\PimcoreHelpersBundle\Repository;
 
 use Pimcore\Model\Asset;
 use Pimcore\Model\Asset\Service;
@@ -46,7 +46,7 @@ class AssetRepository
         $asset->setData(file_get_contents($upload->getPathname()));
 
         if ($overwrite) {
-            $this->deleteIfExists($parent->getFullPath() . "/" . $asset->getKey());
+            $this->deleteIfExists($parent->getFullPath() . "AssetRepository.php/" . $asset->getKey());
         } else {
             $asset->setKey(Service::getUniqueKey($asset));
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Torq\PimcoreHelpersBundle\Service\Repository;
+namespace Torq\PimcoreHelpersBundle\Repository;
 
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject;
