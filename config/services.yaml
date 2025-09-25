@@ -15,6 +15,10 @@ services:
         resource: '../src/Service'
         public: true
 
+    Torq\PimcoreHelpersBundle\Repository\:
+        resource: '../src/Repository'
+        public: true
+
 # add more services, or override services that need manual wiring
 #    Torq\PimcoreHelpersBundle\ExampleClass:
 #        arguments:
