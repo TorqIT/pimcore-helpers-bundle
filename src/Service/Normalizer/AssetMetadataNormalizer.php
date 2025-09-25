@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Torq\PimcoreHelpersBundle\Service\Repository\AssetRepository;
+use Torq\PimcoreHelpersBundle\Repository\AssetRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
 #[AutoconfigureTag('serializer.normalizer.torq.asset_metadata')]
