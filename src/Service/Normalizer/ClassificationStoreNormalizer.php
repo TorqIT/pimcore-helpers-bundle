@@ -43,7 +43,7 @@ class ClassificationStoreNormalizer implements NormalizerInterface
             if ($group === null || $groupName === null) {
                 continue;
             }
-            $output->$groupName = [];
+            $output->$groupName = new stdClass();
             foreach ($keys as $keyId => $languages) {
                 $key = $this->keyRepository->getById($keyId);
                 $keyName = $key?->getName();
@@ -52,7 +52,7 @@ class ClassificationStoreNormalizer implements NormalizerInterface
                 }
                 $value = $this->utils->get($language, $languages) ?? $this->utils->get('default', $languages);
                 $value = $this->getNormalizedValue($value, $language, $key, $group, $data, $format, $context);
-                $output->$groupName[] = $value;
+                $output->$groupName->$keyName = $value;
             }
         }
         return !empty((array)$output) ?  $this->normalizer->normalize($output, $format, $context) : null;
