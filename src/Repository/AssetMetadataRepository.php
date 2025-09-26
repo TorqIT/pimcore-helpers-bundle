@@ -18,7 +18,7 @@ class AssetMetadataRepository
     public function getByAssetId(?int $assetId, ?string $language = null)
     {
         if ($assetId === null) {
-            return null;
+            return [];
         }
 
         $qb = $this->connection->createQueryBuilder();

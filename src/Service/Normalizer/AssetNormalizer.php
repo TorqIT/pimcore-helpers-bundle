@@ -2,6 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
+use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
 use Torq\PimcoreHelpersBundle\Repository\AssetMetadataRepository;
 use ArrayObject;
 use Pimcore\Model\Asset;
@@ -43,7 +44,7 @@ class AssetNormalizer implements NormalizerInterface
         $output->fileType = $data->getType();
         $output->fileSize = $data->getFileSize(formatted: true);
         $metadata = $this->metadataRepository->getByAssetId($data->getId());
-        $output->metadata = $metadata !== null && count($metadata) > 0 ? $metadata : null;
+        $output->metadata = count($metadata) > 0 ? $this->convertAssetMetadataToObject($metadata) : null;
         return $this->normalizer->normalize($output, $format, $context);
     }
 
@@ -55,5 +56,16 @@ class AssetNormalizer implements NormalizerInterface
     public function getSupportedTypes(?string $format): array
     {
         return [Asset::class => true];
+    }
+
+    /** @param AssetMetadata[] $metadata */
+    protected function convertAssetMetadataToObject(array $metadata): object
+    {
+        $output = new stdClass();
+        foreach ($metadata as $metadatum) {
+            $fieldName = $metadatum->getName();
+            $output->$fieldName = $metadatum->getData();
+        }
+        return $output;
     }
 }
