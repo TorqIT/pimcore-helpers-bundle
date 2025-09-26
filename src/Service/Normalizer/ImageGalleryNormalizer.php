@@ -24,7 +24,9 @@ class ImageGalleryNormalizer implements NormalizerInterface
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
         $images = $data->getItems();
-        return array_map(fn($i) => $this->imageNormalizer->normalize($i, $format, $context), $images);
+        return count($images) > 0 ?
+            array_map(fn($i) => $this->imageNormalizer->normalize($i, $format, $context), $images) :
+            null;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

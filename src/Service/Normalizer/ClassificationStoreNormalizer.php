@@ -55,7 +55,7 @@ class ClassificationStoreNormalizer implements NormalizerInterface
                 $output->$groupName[] = $value;
             }
         }
-        return $this->normalizer->normalize($output, $format, $context);
+        return !empty((array)$output) ?  $this->normalizer->normalize($output, $format, $context) : null;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
