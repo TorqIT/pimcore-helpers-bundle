@@ -50,7 +50,7 @@ class ClassificationStoreNormalizer implements NormalizerInterface
                 if ($key === null || $keyName === null) {
                     continue;
                 }
-                $value = $this->utils->get($language, $languages);
+                $value = $this->utils->get($language, $languages) ?? $this->utils->get('default', $languages);
                 $value = $this->getNormalizedValue($value, $language, $key, $group, $data, $format, $context);
                 $output->$groupName[] = $value;
             }
