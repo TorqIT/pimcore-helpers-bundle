@@ -62,7 +62,7 @@ class AssetNormalizer implements NormalizerInterface
     }
 
     /** @param AssetMetadata[] $metadata */
-    protected function convertAssetMetadataToObject(array $metadata): object
+    protected function convertAssetMetadataToObject(array $metadata): ?object
     {
         $output = new stdClass();
         foreach ($metadata as $metadatum) {
