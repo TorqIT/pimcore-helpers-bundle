@@ -13,15 +13,15 @@ class FieldFetcher
 {
     /**
      * @param string[] $excludedFields
-     * @param string[] $includedFieldTypes
+     * @param null|string[] $includedFieldTypes
      * @param string[] $excludedFieldTypes
      * @return string[]
      */
     public function getFields(
-        string|DataObject|FCData|BrickData $object,
+        DataObject|FCData|BrickData|string $object,
         bool $includeId = true,
         array $excludedFields = [],
-        array $includedFieldTypes = [],
+        ?array $includedFieldTypes = null,
         array $excludedFieldTypes = []
     ): array {
         if (is_string($object)) {
@@ -30,41 +30,38 @@ class FieldFetcher
                 throw new InvalidArgumentException("Unsupported class for object: " . $object::class);
             }
         }
-        if ($object instanceof DataObject) {
-            $fields = $this->getFieldDefinitionsFromDataObject($object);
-        } else {
-            $fields = $this->getFieldDefinitionsFromFieldCollection($object);
+        $fields = $this->getFieldsFromFieldConsts($object::class);
+        $fields = array_filter($fields, fn(string $f) => !in_array($f, $excludedFields));
+        if ($includedFieldTypes !== null) {
+            $fields = array_filter($fields, function(string $f) use ($object, $includedFieldTypes) {
+                $type = $this->getFieldDefinitionType($object, $f);
+                return in_array($type, $includedFieldTypes);
+            });
+        } elseif ($excludedFieldTypes) {
+            $fields = array_filter($fields, function(string $f) use ($object, $excludedFieldTypes) {
+                $type = $this->getFieldDefinitionType($object, $f);
+                return !in_array($type, $excludedFieldTypes);
+            });
         }
-        $fields = $this->applyFilters($fields, $excludedFields, $includedFieldTypes, $excludedFieldTypes);
-        $fields = array_map(fn(FieldDef $f) => $f->getName(), $fields);
         if ($object instanceof DataObject && $includeId) {
             array_unshift($fields, 'id');
         }
         return $fields;
     }
 
-    protected function getFieldDefinitionsFromDataObject(DataObject $object)
+    private function getFieldsFromFieldConsts(string $class)
     {
-        return $object->getClass()->getFieldDefinitions();
+        $constants = (new ReflectionClass($class))->getConstants(ReflectionClassConstant::IS_PUBLIC);
+        $fields = array_filter($constants, fn(string $key) => str_starts_with($key, 'FIELD'), ARRAY_FILTER_USE_KEY);
+        return array_values($fields);
     }
 
-    protected function getFieldDefinitionsFromFieldCollection(FCData|BrickData $object)
+    private function getFieldDefinitionType(DataObject|FCData|BrickData $object, string $field)
     {
-        return $object->getDefinition()->getFieldDefinitions();
-    }
-
-    protected function applyFilters(
-        array $fields,
-        array $excludedFields,
-        array $includedFieldTypes,
-        array $excludedFieldTypes
-    ) {
-        return array_filter(
-            $fields,
-            fn(FieldDef $f) => !in_array($f->getName(), $excludedFields) && in_array(
-                $f->getFieldType(),
-                $includedFieldTypes
-            ) && !in_array($f->getFieldType(), $excludedFieldTypes)
-        );
+        if ($object instanceof DataObject) {
+            return $object->getClass()->getFieldDefinition($field)->getFieldType();
+        } else {
+            return $object->getDefinition()->getFieldDefinition($field)->getFieldType();
+        }
     }
 }
