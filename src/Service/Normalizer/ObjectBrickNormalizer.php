@@ -2,7 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-use Torq\PimcoreHelpersBundle\Service\Common\DataObjectFieldFetcher;
+use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
 use ArrayObject;
 use Pimcore\Model\DataObject\Fieldcollection;
 use Pimcore\Model\DataObject\Objectbrick;

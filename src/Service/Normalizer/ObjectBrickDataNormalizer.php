@@ -42,6 +42,6 @@ class ObjectBrickDataNormalizer extends AbstractObjectNormalizer
 
     protected function getFields(object $data, ?string $format = null, array $context = []): array
     {
-        return $this->fieldFetcher->getFieldsFromObject($data::class, includeId: false);
+        return $this->fieldFetcher->getFields($data);
     }
 }

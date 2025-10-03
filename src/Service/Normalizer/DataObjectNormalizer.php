@@ -3,7 +3,7 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 
-use Torq\PimcoreHelpersBundle\Service\Common\DataObjectFieldFetcher;
+use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
 use ArrayObject;
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\ClassDefinition;
@@ -83,7 +83,7 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
 
     protected function getFields(object $data, ?string $format = null, array $context = []): array
     {
-        $fields = $this->fieldFetcher->getFieldsFromObject($data::class);
+        $fields = $this->fieldFetcher->getFields($data);
         return array_filter($fields, fn($field) => $this->includeField($data, $field));
     }
 

@@ -2,7 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-use Torq\PimcoreHelpersBundle\Service\Common\DataObjectFieldFetcher;
+use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
 use ArrayObject;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -15,7 +15,7 @@ abstract class AbstractObjectNormalizer implements NormalizerInterface
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
         protected ArrayUtils $utils,
-        protected DataObjectFieldFetcher $fieldFetcher
+        protected FieldFetcher $fieldFetcher
     ) {
     }
 
