@@ -7,6 +7,8 @@ use Pimcore\Model\DataObject\ClassDefinition\Data as FieldDef;
 use Pimcore\Model\DataObject\Concrete as DataObject;
 use Pimcore\Model\DataObject\Fieldcollection\Data\AbstractData as FCData;
 use Pimcore\Model\DataObject\Objectbrick\Data\AbstractData as BrickData;
+use ReflectionClass;
+use ReflectionClassConstant;
 
 /** Service which fetches the fields from a given data object, field collection, or object brick */
 class FieldFetcher
