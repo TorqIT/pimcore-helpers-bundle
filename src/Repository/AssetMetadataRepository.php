@@ -15,7 +15,7 @@ class AssetMetadataRepository
     ) {
     }
 
-    public function getByAssetId(?int $assetId, ?string $language = null)
+    public function getByAssetId(?int $assetId)
     {
         if ($assetId === null) {
             return [];
@@ -24,7 +24,6 @@ class AssetMetadataRepository
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')->from('assets_metadata', 'metadata');
         $qb->where('cid = :assetId')->setParameter('assetId', $assetId);
-        $qb->andWhere('language = :language')->setParameter('language', $language ?? '');
         $data = $qb->executeQuery()->fetchAllAssociative();
         return array_map(fn(array $d) => $this->hydrate($d), $data);
     }
