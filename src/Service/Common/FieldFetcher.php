@@ -26,12 +26,7 @@ class FieldFetcher
         ?array $includedFieldTypes = null,
         array $excludedFieldTypes = []
     ): array {
-        if (is_string($object)) {
-            $object = new $object;
-            if (!$object instanceof DataObject && !$object instanceof FCData && !$object instanceof BrickData) {
-                throw new InvalidArgumentException("Unsupported class for object: " . $object::class);
-            }
-        }
+        $object = $this->toObject($object);
         $fields = $this->getFieldsFromFieldConsts($object::class);
         $fields = array_filter($fields, fn(string $f) => !in_array($f, $excludedFields));
         if ($includedFieldTypes !== null) {
@@ -49,6 +44,24 @@ class FieldFetcher
             array_unshift($fields, 'id');
         }
         return $fields;
+    }
+
+    public function hasField(DataObject|FCData|BrickData|string $object, string $field)
+    {
+        $object = $this->toObject($object);
+        $fields = $this->getFieldsFromFieldConsts($object::class);
+        return in_array($field, $fields);
+    }
+
+    private function toObject(DataObject|FCData|BrickData|string $object): DataObject|FCData|BrickData
+    {
+        if (is_string($object)) {
+            $object = new $object;
+            if (!$object instanceof DataObject && !$object instanceof FCData && !$object instanceof BrickData) {
+                throw new InvalidArgumentException("Unsupported class for object: " . $object::class);
+            }
+        }
+        return $object;
     }
 
     private function getFieldsFromFieldConsts(string $class)
