@@ -13,10 +13,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
 use Torq\PimcoreHelpersBundle\Repository\AssetMetadataRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
-use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
 #[AutoconfigureTag('serializer.normalizer.torq.asset')]
-#[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
+#[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -2]])]
 class AssetNormalizer implements NormalizerInterface
 {
     public function __construct(
@@ -33,8 +32,6 @@ class AssetNormalizer implements NormalizerInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context, '');
-
         $output = new stdClass();
         $output->id = $data->getId();
         $output->fullPath = $this->getFullPath($data, $format, $context);
@@ -42,7 +39,7 @@ class AssetNormalizer implements NormalizerInterface
         $output->mimeType = $data->getMimeType();
         $output->fileType = $data->getType();
         $output->fileSize = $data->getFileSize(formatted: true);
-        $metadata = $this->metadataRepository->getByAssetId($data->getId(), $language);
+        $metadata = $this->metadataRepository->getByAssetId($data->getId());
         $output->metadata = count($metadata) > 0 ? $this->convertAssetMetadataToObject($metadata) : null;
         return $this->normalizer->normalize($output, $format, $context);
     }
@@ -54,7 +51,7 @@ class AssetNormalizer implements NormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        return [Asset::class => true];
+        return [Asset::class => false];
     }
 
     protected function getFullPath(Asset $data, ?string $format, array $context)

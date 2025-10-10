@@ -4,8 +4,10 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use Pimcore\Model\Asset;
 use Pimcore\Model\Asset\Image;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
+#[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class ImageNormalizer extends AssetNormalizer
 {
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
