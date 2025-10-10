@@ -26,7 +26,7 @@ class ImageNormalizer extends AssetNormalizer
             return parent::getFullPath($data, $format, $context);
         }
         $thumbnail = $this->utils->get(HelperContextBuilder::THUMBNAIL, $context);
-        $path = $thumbnail ? $data->getThumbnail($thumbnail)?->getFrontendPath() : $data->getFullPath();
+        $path = $thumbnail ? $data->getThumbnail($thumbnail)?->getPath() ?? $data->getFullPath() : $data->getFullPath();
         if ($request = $this->requestStack->getCurrentRequest()) {
             return $request->getSchemeAndHttpHost() . $path;
         } else {
