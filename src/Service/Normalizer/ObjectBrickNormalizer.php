@@ -2,6 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
 use ArrayObject;
 use Pimcore\Model\DataObject\Fieldcollection;
@@ -18,8 +19,6 @@ use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class ObjectBrickNormalizer implements NormalizerInterface
 {
-    public const WITH_INHERITED_VALUES = 'withInheritedValues';
-
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
         protected ArrayUtils $utils,
@@ -32,10 +31,10 @@ class ObjectBrickNormalizer implements NormalizerInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $withInheritedValues = $this->utils->get(self::WITH_INHERITED_VALUES, $context, false);
+        $inheritedValues = $this->utils->get(HelperContextBuilder::INHERIT_VALUES, $context, false);
 
         /** @var ObjectBrickData[] $bricks */
-        $bricks = $data->getItems($withInheritedValues);
+        $bricks = $data->getItems($inheritedValues);
         $output = new stdClass();
         foreach ($bricks as $brick) {
             $brickName = $brick->getType();

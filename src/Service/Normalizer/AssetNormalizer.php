@@ -2,8 +2,6 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
-use Torq\PimcoreHelpersBundle\Repository\AssetMetadataRepository;
 use ArrayObject;
 use Pimcore\Model\Asset;
 use stdClass;
@@ -12,17 +10,20 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
+use Torq\PimcoreHelpersBundle\Repository\AssetMetadataRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
 #[AutoconfigureTag('serializer.normalizer.torq.asset')]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class AssetNormalizer implements NormalizerInterface
 {
     public function __construct(
-        #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface $normalizer,
-        private ArrayUtils $utils,
-        private AssetMetadataRepository $metadataRepository,
-        private RequestStack $requestStack
+        #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
+        protected ArrayUtils $utils,
+        protected AssetMetadataRepository $metadataRepository,
+        protected RequestStack $requestStack
     ) {
     }
 
@@ -32,16 +33,11 @@ class AssetNormalizer implements NormalizerInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $language = $this->utils->get(AbstractObjectNormalizer::LANGUAGE, $context, '');
-        $request = $this->requestStack->getCurrentRequest();
+        $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context, '');
 
         $output = new stdClass();
         $output->id = $data->getId();
-        if ($request !== null) {
-            $output->fullPath = $request->getSchemeAndHttpHost() . $data->getFullPath();
-        } else {
-            $output->fullPath = $data->getFullPath();
-        }
+        $output->fullPath = $this->getFullPath($data, $format, $context);
         $output->fileName = $data->getKey();
         $output->mimeType = $data->getMimeType();
         $output->fileType = $data->getType();
@@ -59,6 +55,15 @@ class AssetNormalizer implements NormalizerInterface
     public function getSupportedTypes(?string $format): array
     {
         return [Asset::class => true];
+    }
+
+    protected function getFullPath(Asset $data, ?string $format, array $context)
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            return $request->getSchemeAndHttpHost() . $data->getFullPath();
+        } else {
+            return $data->getFullPath();
+        }
     }
 
     /** @param AssetMetadata[] $metadata */

@@ -2,19 +2,19 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-use Torq\PimcoreHelpersBundle\Repository\GroupRepository;
-use Torq\PimcoreHelpersBundle\Repository\KeyRepository;
 use ArrayObject;
 use Pimcore\Model\DataObject\Classificationstore;
 use Pimcore\Model\DataObject\Classificationstore\GroupConfig;
 use Pimcore\Model\DataObject\Classificationstore\KeyConfig;
-use Pimcore\Model\DataObject\Concrete as DataObject;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Torq\PimcoreHelpersBundle\Repository\GroupRepository;
+use Torq\PimcoreHelpersBundle\Repository\KeyRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
 #[AutoconfigureTag('serializer.normalizer.torq.classification_store')]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
@@ -34,7 +34,7 @@ class ClassificationStoreNormalizer implements NormalizerInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $language = $this->utils->get(AbstractObjectNormalizer::LANGUAGE, $context, 'default');
+        $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context, 'default');
 
         $output = new stdClass();
         foreach ($data->getItems() as $groupId => $keys) {

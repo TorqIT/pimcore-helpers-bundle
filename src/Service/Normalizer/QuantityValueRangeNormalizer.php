@@ -12,7 +12,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class QuantityValueRangeNormalizer implements NormalizerInterface
 {
-
     /* @param QuantityValueRange $data */
     public function normalize(
         mixed $data,

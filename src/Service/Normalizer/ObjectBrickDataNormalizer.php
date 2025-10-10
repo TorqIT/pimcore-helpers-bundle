@@ -2,34 +2,10 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-use ArrayObject;
 use Pimcore\Model\DataObject\Objectbrick\Data\AbstractData as ObjectBrickData;
-use stdClass;
 
-class ObjectBrickDataNormalizer extends AbstractObjectNormalizer
+class ObjectBrickDataNormalizer extends FieldCollectionDataNormalizer
 {
-    public function normalize(
-        mixed $data,
-        ?string $format = null,
-        array $context = []
-    ): array|string|int|float|bool|ArrayObject|null {
-        $language = $this->utils->get(self::LANGUAGE, $context);
-
-        $output = new stdClass();
-        $fields = $this->getFields($data, $format, $context);
-        foreach ($fields as $field) {
-            $output->$field = $this->normalizeValue(
-                $data->get($field, $language),
-                $field,
-                $language,
-                $data,
-                $format,
-                $context
-            );
-        }
-        return $this->normalizeOutput($output, $data, $format, $context);
-    }
-
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof ObjectBrickData;
@@ -38,10 +14,5 @@ class ObjectBrickDataNormalizer extends AbstractObjectNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [ObjectBrickData::class => false];
-    }
-
-    protected function getFields(object $data, ?string $format = null, array $context = []): array
-    {
-        return $this->fieldFetcher->getFields($data);
     }
 }

@@ -10,8 +10,6 @@ use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
 abstract class AbstractObjectNormalizer implements NormalizerInterface
 {
-    public const LANGUAGE = 'language';
-
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
         protected ArrayUtils $utils,

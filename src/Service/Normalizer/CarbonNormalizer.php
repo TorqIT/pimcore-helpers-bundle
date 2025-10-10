@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
 #[AutoconfigureTag('serializer.normalizer.torq.carbon')]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
@@ -25,7 +26,7 @@ class CarbonNormalizer implements NormalizerInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $dateFormat = $this->utils->get('dateFormat', $context, 'ISO8601');
+        $dateFormat = $this->utils->get(HelperContextBuilder::DATE_FORMAT, $context, 'ISO8601');
         return $dateFormat === 'ISO8601' ? $data->toIso8601String() : $data->format($dateFormat);
     }
 

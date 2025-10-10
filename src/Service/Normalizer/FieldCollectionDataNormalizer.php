@@ -7,6 +7,7 @@ use Pimcore\Model\DataObject\Fieldcollection\Data\AbstractData as FieldData;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
 #[AutoconfigureTag('serializer.normalizer.torq.field_collection_data')]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
@@ -17,7 +18,7 @@ class FieldCollectionDataNormalizer extends AbstractObjectNormalizer
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $language = $this->utils->get(AbstractObjectNormalizer::LANGUAGE, $context);
+        $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context);
 
         $output = new stdClass();
         $fields = $this->getFields($data, $format, $context);

@@ -46,7 +46,7 @@ class AssetRepository
         $asset->setData(file_get_contents($upload->getPathname()));
 
         if ($overwrite) {
-            $this->deleteIfExists($parent->getFullPath() . "AssetRepository.php/" . $asset->getKey());
+            $this->deleteIfExists($parent->getFullPath() . "/" . $asset->getKey());
         } else {
             $asset->setKey(Service::getUniqueKey($asset));
         }

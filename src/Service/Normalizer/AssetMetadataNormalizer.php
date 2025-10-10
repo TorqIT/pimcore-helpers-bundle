@@ -2,9 +2,6 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
-use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadataType;
-use Torq\PimcoreHelpersBundle\Repository\DataObjectRepository;
 use ArrayObject;
 use Carbon\Carbon;
 use Exception;
@@ -14,15 +11,17 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
+use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadataType;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Repository\AssetRepository;
+use Torq\PimcoreHelpersBundle\Repository\DataObjectRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
 #[AutoconfigureTag('serializer.normalizer.torq.asset_metadata')]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class AssetMetadataNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    public const IS_VALUE_SERIALIZED = 'isValueSerialized';
-
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] private ObjectNormalizer $normalizer,
         private DataObjectRepository $objectRepository,
@@ -43,7 +42,7 @@ class AssetMetadataNormalizer implements NormalizerInterface, DenormalizerInterf
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         $get = fn(string $key) => $this->utils->get($key, $data);
-        $isValueSerialized = $this->utils->get(static::IS_VALUE_SERIALIZED, $context, false);
+        $isValueSerialized = $this->utils->get(HelperContextBuilder::IS_VALUE_SERIALIZED, $context, false);
 
         $metadata = new AssetMetadata();
         $metadata->setName($get('name'));

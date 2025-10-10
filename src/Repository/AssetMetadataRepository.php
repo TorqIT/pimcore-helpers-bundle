@@ -3,6 +3,7 @@
 namespace Torq\PimcoreHelpersBundle\Repository;
 
 use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\AssetMetadataNormalizer;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -34,10 +35,11 @@ class AssetMetadataRepository
      */
     public function hydrate(array $data, ?AssetMetadata $metadata = null): AssetMetadata
     {
-        $metadata = $metadata ?? new AssetMetadata();
-        return $this->normalizer->denormalize($data, AssetMetadata::class, context: [
-            AbstractNormalizer::OBJECT_TO_POPULATE => $metadata,
-            AssetMetadataNormalizer::IS_VALUE_SERIALIZED => true
-        ]);
+        $context = HelperContextBuilder::create()
+            ->withObjectToPopulate($metadata ?? new AssetMetadata())
+            ->isValueSerialized(true)
+            ->toArray();
+
+        return $this->normalizer->denormalize($data, AssetMetadata::class, context: $context);
     }
 }
