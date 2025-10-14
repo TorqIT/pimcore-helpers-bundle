@@ -14,6 +14,13 @@ class AssetRepository
         return Asset::getById($id);
     }
 
+    public function getByFilename(string $filename)
+    {
+        $list = new Asset\Listing();
+        $list->addConditionParam('filename = ?', $filename);
+        return $list->getData() ?? [];
+    }
+
     public function getByPath(string $path)
     {
         return Asset::getByPath($path);
