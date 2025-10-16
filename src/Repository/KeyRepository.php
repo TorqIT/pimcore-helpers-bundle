@@ -6,6 +6,12 @@ use Pimcore\Model\DataObject\Classificationstore\KeyConfig;
 
 class KeyRepository
 {
+    public function save(KeyConfig $key): KeyConfig
+    {
+        $key->save();
+        return $key;
+    }
+
     public function get(null|int|string|KeyConfig $identifier, int $storeId = 1): ?KeyConfig
     {
         if (is_int($identifier)) {

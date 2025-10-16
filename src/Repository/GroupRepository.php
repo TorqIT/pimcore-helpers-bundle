@@ -6,6 +6,12 @@ use Pimcore\Model\DataObject\Classificationstore\GroupConfig;
 
 class GroupRepository
 {
+    public function save(GroupConfig $group): GroupConfig
+    {
+        $group->save();
+        return $group;
+    }
+
     public function get(null|int|string|GroupConfig $identifier, int $storeId = 1): ?GroupConfig
     {
         if (is_int($identifier)) {
