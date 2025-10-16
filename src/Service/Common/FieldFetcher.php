@@ -53,6 +53,16 @@ class FieldFetcher
         return in_array($field, $fields);
     }
 
+    public function getFieldDefinitionType(DataObject|FCData|BrickData|string $object, string $field)
+    {
+        $object = $this->toObject($object);
+        if ($object instanceof DataObject) {
+            return $object->getClass()->getFieldDefinition($field)->getFieldType();
+        } else {
+            return $object->getDefinition()->getFieldDefinition($field)->getFieldType();
+        }
+    }
+
     private function toObject(DataObject|FCData|BrickData|string $object): DataObject|FCData|BrickData
     {
         if (is_string($object)) {
@@ -69,14 +79,5 @@ class FieldFetcher
         $constants = (new ReflectionClass($class))->getConstants(ReflectionClassConstant::IS_PUBLIC);
         $fields = array_filter($constants, fn(string $key) => str_starts_with($key, 'FIELD'), ARRAY_FILTER_USE_KEY);
         return array_values($fields);
-    }
-
-    private function getFieldDefinitionType(DataObject|FCData|BrickData $object, string $field)
-    {
-        if ($object instanceof DataObject) {
-            return $object->getClass()->getFieldDefinition($field)->getFieldType();
-        } else {
-            return $object->getDefinition()->getFieldDefinition($field)->getFieldType();
-        }
     }
 }
