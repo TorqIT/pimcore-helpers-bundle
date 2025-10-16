@@ -15,6 +15,7 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public const string INCLUDE_CHILDREN = 'includeChildren';
     public const string CHILD_TYPES = 'childTypes';
     public const string INHERIT_VALUES = 'inheritValues';
+    public const string SKIP_NULL_VALUES = 'skipNullValues';
 
     // Asset
     public const THUMBNAIL = 'thumbnail';
@@ -57,7 +58,7 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
         return $this->with(self::DATE_FORMAT, $dateFormat);
     }
 
-    public function includeChildren(bool $includeChildren)
+    public function includeChildren(bool $includeChildren = true)
     {
         return $this->with(self::INCLUDE_CHILDREN, $includeChildren);
     }
@@ -73,22 +74,27 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
         return $this->with(self::INHERIT_VALUES, $inheritValues);
     }
 
+    public function skipNullValues(bool $skipNullValues = true)
+    {
+        return $this->with(self::SKIP_NULL_VALUES, $skipNullValues);
+    }
+
     public function useThumbnail(string $configName)
     {
         return $this->with(self::THUMBNAIL, $configName);
     }
 
-    public function isValueSerialized(bool $isSerialized)
+    public function valuesAreSerialized(bool $isSerialized = true)
     {
         return $this->with(self::IS_VALUE_SERIALIZED, $isSerialized);
     }
 
-    public function withAlpha(bool $withAlpha)
+    public function includeAlpha(bool $withAlpha = true)
     {
         return $this->with(self::WITH_ALPHA, $withAlpha);
     }
 
-    public function withHash(bool $withHash)
+    public function includeHash(bool $withHash = true)
     {
         return $this->with(self::WITH_HASH, $withHash);
     }

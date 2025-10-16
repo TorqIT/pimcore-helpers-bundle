@@ -5,7 +5,6 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Pimcore\Model\DataObject\AbstractObject;
-use Pimcore\Model\DataObject\ClassDefinition;
 use Pimcore\Model\DataObject\Concrete as DataObject;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
@@ -32,6 +31,7 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         $inheritValues = $this->utils->get(HelperContextBuilder::INHERIT_VALUES, $context, true);
         $includeChildren = $this->utils->get(HelperContextBuilder::INCLUDE_CHILDREN, $context, false);
         $childTypes = $this->utils->get(HelperContextBuilder::CHILD_TYPES, $context, self::DEFAULT_CHILD_TYPES);
+        $skipNullValues = $this->utils->get(HelperContextBuilder::SKIP_NULL_VALUES, $context, false);
 
         // set for just this object
         if (!$inheritValues) {
@@ -41,7 +41,7 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         $output = new stdClass();
         $fields = $this->getFields($data, $format, $context);
         foreach ($fields as $field) {
-            $output->$field = $this->normalizeValue(
+            $value = $this->normalizeValue(
                 $data->get($field, $language),
                 $field,
                 $language,
@@ -49,6 +49,12 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
                 $format,
                 $context
             );
+
+            if ($skipNullValues && $value === null) {
+                continue;
+            } else {
+                $output->$field = $value;
+            }
         }
 
         if ($includeChildren) {
@@ -56,7 +62,7 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
             $output->children = $children && count($children) > 0 ? $children : null;
         }
 
-        // reset for next object being serialized
+        // reset for next thing being serialized
         if (!$inheritValues) {
             AbstractObject::setGetInheritedValues(true);
         }
@@ -76,14 +82,6 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
 
     protected function getFields(object $data, ?string $format = null, array $context = []): array
     {
-        $fields = $this->fieldFetcher->getFields($data);
-        return array_filter($fields, fn($field) => $this->includeField($data, $field));
-    }
-
-    private function includeField(object $data, string $field)
-    {
-        /** @var DataObject $data */
-        $fieldDefinition = ClassDefinition::getByName($data->getClassName())?->getFieldDefinition($field);
-        return $fieldDefinition?->getFieldType() !== 'reverseObjectRelation';
+        return $this->fieldFetcher->getFields($data, excludedFieldTypes: ['reverseObjectRelation']);
     }
 }

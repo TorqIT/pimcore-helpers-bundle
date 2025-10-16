@@ -19,11 +19,12 @@ class FieldCollectionDataNormalizer extends AbstractObjectNormalizer
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
         $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context);
+        $skipNullValues = $this->utils->get(HelperContextBuilder::SKIP_NULL_VALUES, $context, false);
 
         $output = new stdClass();
         $fields = $this->getFields($data, $format, $context);
         foreach ($fields as $field) {
-            $output->$field = $this->normalizeValue(
+            $value = $this->normalizeValue(
                 $data->get($field, $language),
                 $field,
                 $language,
@@ -31,6 +32,12 @@ class FieldCollectionDataNormalizer extends AbstractObjectNormalizer
                 $format,
                 $context
             );
+
+            if ($skipNullValues && $value === null) {
+                continue;
+            } else {
+                $output->$field = $value;
+            }
         }
         return $this->normalizeOutput($output, $data, $format, $context);
     }

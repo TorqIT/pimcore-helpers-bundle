@@ -36,8 +36,7 @@ class AssetMetadataRepository
     public function hydrate(array $data, ?AssetMetadata $metadata = null): AssetMetadata
     {
         $context = HelperContextBuilder::create()
-            ->withObjectToPopulate($metadata ?? new AssetMetadata())
-            ->isValueSerialized(true)
+            ->withObjectToPopulate($metadata ?? new AssetMetadata())->valuesAreSerialized(true)
             ->toArray();
 
         return $this->normalizer->denormalize($data, AssetMetadata::class, context: $context);

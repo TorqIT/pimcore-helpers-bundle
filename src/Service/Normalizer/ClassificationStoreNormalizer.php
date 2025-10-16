@@ -3,6 +3,7 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
+use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Classificationstore;
 use Pimcore\Model\DataObject\Classificationstore\GroupConfig;
 use Pimcore\Model\DataObject\Classificationstore\KeyConfig;
@@ -35,6 +36,12 @@ class ClassificationStoreNormalizer implements NormalizerInterface
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
         $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context, 'default');
+        $inheritValues = $this->utils->get(HelperContextBuilder::INHERIT_VALUES, $context, true);
+
+        // set for just this object
+        if (!$inheritValues) {
+            AbstractObject::setGetInheritedValues(false);
+        }
 
         $output = new stdClass();
         foreach ($data->getItems() as $groupId => $keys) {
@@ -55,6 +62,12 @@ class ClassificationStoreNormalizer implements NormalizerInterface
                 $output->$groupName->$keyName = $value;
             }
         }
+
+        // reset for next thing being serialized
+        if (!$inheritValues) {
+            AbstractObject::setGetInheritedValues(true);
+        }
+
         return !empty((array)$output) ?  $this->normalizer->normalize($output, $format, $context) : null;
     }
 
