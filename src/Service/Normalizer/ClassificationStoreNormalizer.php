@@ -35,7 +35,12 @@ class ClassificationStoreNormalizer implements NormalizerInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context, 'default');
+        $object = $this->toStandardObject($data, $format, $context);
+        return !empty((array)$object) ? $this->normalizer->normalize($object, $format, $context) : null;
+    }
+
+    protected function toStandardObject(mixed $data, ?string $format = null, array $context = []): stdClass
+    {
         $inheritValues = $this->utils->get(HelperContextBuilder::INHERIT_VALUES, $context, true);
 
         // set for just this object
@@ -43,23 +48,22 @@ class ClassificationStoreNormalizer implements NormalizerInterface
             AbstractObject::setGetInheritedValues(false);
         }
 
-        $output = new stdClass();
+        $object = new stdClass();
         foreach ($data->getItems() as $groupId => $keys) {
             $group = $this->groupRepository->getById($groupId);
             $groupName = $group?->getName();
             if ($group === null || $groupName === null) {
                 continue;
             }
-            $output->$groupName = new stdClass();
-            foreach ($keys as $keyId => $languages) {
+            $object->$groupName = new stdClass();
+            foreach ($keys as $keyId => $valuesByLanguage) {
                 $key = $this->keyRepository->getById($keyId);
                 $keyName = $key?->getName();
                 if ($key === null || $keyName === null) {
                     continue;
                 }
-                $value = $this->utils->get($language, $languages) ?? $this->utils->get('default', $languages);
-                $value = $this->getNormalizedValue($value, $language, $key, $group, $data, $format, $context);
-                $output->$groupName->$keyName = $value;
+                $value = $this->getValue($valuesByLanguage, $key, $group, $data, $format, $context);
+                $object->$groupName->$keyName = $value;
             }
         }
 
@@ -68,7 +72,19 @@ class ClassificationStoreNormalizer implements NormalizerInterface
             AbstractObject::setGetInheritedValues(true);
         }
 
-        return !empty((array)$output) ?  $this->normalizer->normalize($output, $format, $context) : null;
+        return $object;
+    }
+
+    protected function getValue(
+        array $valuesByLanguage,
+        KeyConfig $key,
+        GroupConfig $group,
+        Classificationstore $store,
+        ?string $format = null,
+        array $context = []
+    ) {
+        $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context, 'default');
+        return $this->utils->get($language, $valuesByLanguage) ?? $this->utils->get('default', $valuesByLanguage);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -79,18 +95,5 @@ class ClassificationStoreNormalizer implements NormalizerInterface
     public function getSupportedTypes(?string $format): array
     {
         return [Classificationstore::class => true];
-    }
-
-    /** Overridable function for operating on field value prior to inclusion in normalized output */
-    protected function getNormalizedValue(
-        mixed $value,
-        string $language,
-        KeyConfig $key,
-        GroupConfig $group,
-        Classificationstore $store,
-        ?string $format = null,
-        array $context = []
-    ): array|string|int|float|bool|ArrayObject|null {
-        return $value;
     }
 }

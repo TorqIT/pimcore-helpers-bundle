@@ -10,12 +10,17 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     // Common
     public const string LANGUAGE = 'language';
     public const string DATE_FORMAT = 'dateFormat';
+    public const string EMPTY_ARRAYS_AS_NULL = 'emptyArraysAsNull';
 
     // Object
     public const string INCLUDE_CHILDREN = 'includeChildren';
     public const string CHILD_TYPES = 'childTypes';
     public const string INHERIT_VALUES = 'inheritValues';
     public const string SKIP_NULL_VALUES = 'skipNullValues';
+    public const string INCLUDE_ID = 'includeId';
+    public const string EXCLUDED_FIELDS = 'excludedFields';
+    public const string INCLUDED_FIELD_TYPES = 'includedFieldTypes';
+    public const string EXCLUDED_FIELD_TYPES = 'excludedFieldTypes';
 
     // Asset
     public const THUMBNAIL = 'thumbnail';
@@ -58,6 +63,11 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
         return $this->with(self::DATE_FORMAT, $dateFormat);
     }
 
+    public function castEmptyArraysToNull(bool $castToNull = true)
+    {
+        return $this->with(self::EMPTY_ARRAYS_AS_NULL, $castToNull);
+    }
+
     public function includeChildren(bool $includeChildren = true)
     {
         return $this->with(self::INCLUDE_CHILDREN, $includeChildren);
@@ -77,6 +87,47 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public function skipNullValues(bool $skipNullValues = true)
     {
         return $this->with(self::SKIP_NULL_VALUES, $skipNullValues);
+    }
+
+    public function includeId(bool $includeId = true)
+    {
+        return $this->with(self::INCLUDE_ID, $includeId);
+    }
+
+    /** @param string[] $excludedFields */
+    public function excludeFields(array $excludedFields)
+    {
+        return $this->with(self::EXCLUDED_FIELDS, $excludedFields);
+    }
+
+    public function addExcludedField(string $field)
+    {
+        $existingExclusion = $this->toArray()[self::EXCLUDED_FIELDS] ?? [];
+        return $this->with(self::EXCLUDED_FIELDS, [...$existingExclusion, $field]);
+    }
+
+    /** @param string[] $includedFieldTypes */
+    public function includeFieldTypes(array $includedFieldTypes)
+    {
+        return $this->with(self::INCLUDED_FIELD_TYPES, $includedFieldTypes);
+    }
+
+    public function addIncludedFieldType(string $type)
+    {
+        $existingInclusions = $this->toArray()[self::INCLUDED_FIELD_TYPES] ?? [];
+        return $this->with(self::INCLUDED_FIELD_TYPES, [...$existingInclusions, $type]);
+    }
+
+    /** @param string[] $excludedFieldTypes */
+    public function excludeFieldTypes(array $excludedFieldTypes)
+    {
+        return $this->with(self::EXCLUDED_FIELD_TYPES, $excludedFieldTypes);
+    }
+
+    public function addExcludedFieldType(string $type)
+    {
+        $existingExclusions = $this->toArray()[self::EXCLUDED_FIELD_TYPES] ?? [];
+        return $this->with(self::EXCLUDED_FIELD_TYPES, [...$existingExclusions, $type]);
     }
 
     public function useThumbnail(string $configName)

@@ -3,7 +3,6 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 
-use ArrayObject;
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Concrete as DataObject;
 use stdClass;
@@ -22,44 +21,22 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
     ];
 
     /** @param DataObject $data */
-    public function normalize(
-        mixed $data,
-        ?string $format = null,
-        array $context = []
-    ): array|string|int|float|bool|ArrayObject|null {
-        $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context);
+    protected function toStandardObject(mixed $data, ?string $format = null, array $context = []): stdClass
+    {
         $inheritValues = $this->utils->get(HelperContextBuilder::INHERIT_VALUES, $context, true);
         $includeChildren = $this->utils->get(HelperContextBuilder::INCLUDE_CHILDREN, $context, false);
         $childTypes = $this->utils->get(HelperContextBuilder::CHILD_TYPES, $context, self::DEFAULT_CHILD_TYPES);
-        $skipNullValues = $this->utils->get(HelperContextBuilder::SKIP_NULL_VALUES, $context, false);
 
         // set for just this object
         if (!$inheritValues) {
             AbstractObject::setGetInheritedValues(false);
         }
 
-        $output = new stdClass();
-        $fields = $this->getFields($data, $format, $context);
-        foreach ($fields as $field) {
-            $value = $this->normalizeValue(
-                $data->get($field, $language),
-                $field,
-                $language,
-                $data,
-                $format,
-                $context
-            );
-
-            if ($skipNullValues && $value === null) {
-                continue;
-            } else {
-                $output->$field = $value;
-            }
-        }
+        $object = parent::toStandardObject($data, $format, $context);
 
         if ($includeChildren) {
             $children = $data->getChildren($childTypes)->getData();
-            $output->children = $children && count($children) > 0 ? $children : null;
+            $object->children = $children && count($children) > 0 ? $children : null;
         }
 
         // reset for next thing being serialized
@@ -67,7 +44,13 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
             AbstractObject::setGetInheritedValues(true);
         }
 
-        return $this->normalizeOutput($output, $data, $format, $context);
+        return $object;
+    }
+
+    protected function getFields(object $data, ?string $format = null, array $context = []): array
+    {
+        $context = HelperContextBuilder::create()->withContext($context)->addExcludedFieldType('reverseObjectRelation');
+        return parent::getFields($data, context: $context->toArray());
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -78,10 +61,5 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [DataObject::class => false];
-    }
-
-    protected function getFields(object $data, ?string $format = null, array $context = []): array
-    {
-        return $this->fieldFetcher->getFields($data, excludedFieldTypes: ['reverseObjectRelation']);
     }
 }
