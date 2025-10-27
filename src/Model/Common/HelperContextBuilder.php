@@ -22,6 +22,10 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public const string INCLUDED_FIELD_TYPES = 'includedFieldTypes';
     public const string EXCLUDED_FIELD_TYPES = 'excludedFieldTypes';
 
+    // Classification Store
+    public const GROUP_FILTER = 'groupFilter';
+    public const KEY_FILTERS = 'keyFilter';
+
     // Asset
     public const THUMBNAIL = 'thumbnail';
     public const IS_VALUE_SERIALIZED = 'isValueSerialized';
@@ -128,6 +132,14 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     {
         $existingExclusions = $this->toArray()[self::EXCLUDED_FIELD_TYPES] ?? [];
         return $this->with(self::EXCLUDED_FIELD_TYPES, [...$existingExclusions, $type]);
+    }
+
+    public function withGroupFilter(callable $fn) {
+        return $this->with(self::GROUP_FILTER, $fn);
+    }
+
+    public function withKeyFilter(callable $fn) {
+        return $this->with(self::KEY_FILTERS, $fn);
     }
 
     public function useThumbnail(string $configName)

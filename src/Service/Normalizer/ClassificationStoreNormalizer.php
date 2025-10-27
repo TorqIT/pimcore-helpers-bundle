@@ -39,9 +39,12 @@ class ClassificationStoreNormalizer implements NormalizerInterface
         return !empty((array)$object) ? $this->normalizer->normalize($object, $format, $context) : null;
     }
 
+    /** @param Classificationstore $data */
     protected function toStandardObject(mixed $data, ?string $format = null, array $context = []): stdClass
     {
         $inheritValues = $this->utils->get(HelperContextBuilder::INHERIT_VALUES, $context, true);
+        $groupFilter = $this->utils->get(HelperContextBuilder::GROUP_FILTER, $context);
+        $keyFilter = $this->utils->get(HelperContextBuilder::KEY_FILTERS, $context);
 
         // set for just this object
         if (!$inheritValues) {
@@ -52,14 +55,14 @@ class ClassificationStoreNormalizer implements NormalizerInterface
         foreach ($data->getItems() as $groupId => $keys) {
             $group = $this->groupRepository->getById($groupId);
             $groupName = $group?->getName();
-            if ($group === null || $groupName === null) {
+            if ($group === null || $groupName === null || (is_callable($groupFilter) && !$groupFilter($group))) {
                 continue;
             }
             $object->$groupName = new stdClass();
             foreach ($keys as $keyId => $valuesByLanguage) {
                 $key = $this->keyRepository->getById($keyId);
                 $keyName = $key?->getName();
-                if ($key === null || $keyName === null) {
+                if ($key === null || $keyName === null || (is_callable($keyFilter) && !$keyFilter($key))) {
                     continue;
                 }
                 $value = $this->getValue($valuesByLanguage, $key, $group, $data, $format, $context);
