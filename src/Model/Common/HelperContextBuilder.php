@@ -2,6 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Model\Common;
 
+use Locale;
 use Symfony\Component\Serializer\Context\Normalizer\AbstractNormalizerContextBuilder;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
@@ -9,6 +10,8 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
 {
     // Common
     public const string LANGUAGE = 'language';
+    public const string DISPLAY_LANGUAGE = 'displayLanguage';
+    public const string COUNTRY_CODE = 'countryCode';
     public const string DATE_FORMAT = 'dateFormat';
     public const string EMPTY_ARRAYS_AS_NULL = 'emptyArraysAsNull';
 
@@ -55,7 +58,15 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
      * */
     public function withLanguage(string $language)
     {
-        return $this->with(self::LANGUAGE, $language);
+        $displayLanguage = Locale::getDisplayLanguage($language, 'en_US');
+
+        return
+            $this->with(self::LANGUAGE, $language)->with(self::DISPLAY_LANGUAGE, $displayLanguage);
+    }
+
+    public function withCountryCode(string $countryCode)
+    {
+        return $this->with(self::COUNTRY_CODE, $countryCode);
     }
 
     /**
@@ -134,11 +145,13 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
         return $this->with(self::EXCLUDED_FIELD_TYPES, [...$existingExclusions, $type]);
     }
 
-    public function withGroupFilter(callable $fn) {
+    public function withGroupFilter(callable $fn)
+    {
         return $this->with(self::GROUP_FILTER, $fn);
     }
 
-    public function withKeyFilter(callable $fn) {
+    public function withKeyFilter(callable $fn)
+    {
         return $this->with(self::KEY_FILTERS, $fn);
     }
 
