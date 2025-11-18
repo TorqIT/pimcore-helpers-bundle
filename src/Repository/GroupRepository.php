@@ -3,9 +3,13 @@
 namespace Torq\PimcoreHelpersBundle\Repository;
 
 use Pimcore\Model\DataObject\Classificationstore\GroupConfig;
+use Pimcore\Model\DataObject\Classificationstore\KeyConfig;
+use Pimcore\Model\DataObject\Classificationstore\KeyGroupRelation;
 
 class GroupRepository
 {
+    public function __construct(private KeyRepository $keyRepository) {}
+
     public function save(GroupConfig $group): GroupConfig
     {
         $group->save();
@@ -30,5 +34,14 @@ class GroupRepository
     public function getByName(?string $name, int $storeId = 1): ?GroupConfig
     {
         return $name !== null ? GroupConfig::getByName($name, $storeId) : null;
+    }
+
+    /** @return KeyConfig[] */
+    public function getKeysForGroup(null|int|string|GroupConfig $identifier, int $storeId = 1): array {
+        $group = $this->get($identifier, $storeId);
+        return array_map(
+            fn(KeyGroupRelation $r) => $this->keyRepository->get($r->getKeyId(), $storeId),
+            $group?->getRelations() ?? [],
+        );
     }
 }
