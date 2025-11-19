@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AssetRepository
 {
+    public function __construct(private FolderRepository $folderRepository) {}
+
     public function getById(int $id): ?Asset
     {
         return Asset::getById($id);
@@ -45,7 +47,23 @@ class AssetRepository
         }
     }
 
-    public function createAsset(UploadedFile $upload, ElementInterface $parent, bool $overwrite = false)
+    public function createOrUpdateAsset(mixed $data, string $filename, string|ElementInterface $parent) {
+        if (is_string($parent)) {
+            $parent = $this->folderRepository->getOrCreateAssetFolder($parent);
+        }
+
+        $asset = $this->getByPath($filename . $parent->getPath());
+        if ($asset === null) {
+            $asset = new Asset();
+            $asset->setKey($filename);
+            $asset->setParent($parent);
+        }
+
+        $asset->setData($data);
+        return $this->save($asset);
+    }
+
+    public function createAssetFromUploadedFile(UploadedFile $upload, ElementInterface $parent, bool $overwrite = false)
     {
         $asset = new Asset();
         $asset->setKey($upload->getClientOriginalName());
