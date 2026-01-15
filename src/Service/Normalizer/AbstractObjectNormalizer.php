@@ -55,12 +55,18 @@ abstract class AbstractObjectNormalizer implements NormalizerInterface
     protected function getFields(object $data, ?string $format = null, array $context = []): array
     {
         $includeId = $this->utils->get(HelperContextBuilder::INCLUDE_ID, $context, true);
+        $includeProperties = $this->utils->get(HelperContextBuilder::INCLUDE_PROPERTIES, $context, false);
         $excludedFields = $this->utils->get(HelperContextBuilder::EXCLUDED_FIELDS, $context, []);
         $includedFieldTypes = $this->utils->get(HelperContextBuilder::INCLUDED_FIELD_TYPES, $context);
         $excludedFieldTypes = $this->utils->get(HelperContextBuilder::EXCLUDED_FIELD_TYPES, $context, []);
 
-        return $this->fieldFetcher->getFields($data, $includeId, $excludedFields, $includedFieldTypes,
-            $excludedFieldTypes
+        return $this->fieldFetcher->getFields(
+            $data,
+            includeId: $includeId,
+            includeProperties: $includeProperties,
+            excludedFields: $excludedFields,
+            includedFieldTypes: $includedFieldTypes,
+            excludedFieldTypes: $excludedFieldTypes,
         );
     }
 

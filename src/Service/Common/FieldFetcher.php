@@ -22,6 +22,7 @@ class FieldFetcher
     public function getFields(
         DataObject|FCData|BrickData|string $object,
         bool $includeId = true,
+        bool $includeProperties = false,
         array $excludedFields = [],
         ?array $includedFieldTypes = null,
         array $excludedFieldTypes = []
@@ -42,6 +43,9 @@ class FieldFetcher
         }
         if ($object instanceof DataObject && $includeId) {
             array_unshift($fields, 'id');
+        }
+        if ($object instanceof DataObject && $includeProperties) {
+            $fields[] = 'properties';
         }
         return $fields;
     }

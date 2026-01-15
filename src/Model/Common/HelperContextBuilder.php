@@ -19,6 +19,7 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public const string INHERIT_VALUES = 'inheritValues';
     public const string SKIP_NULL_VALUES = 'skipNullValues';
     public const string INCLUDE_ID = 'includeId';
+    public const string INCLUDE_PROPERTIES = 'includeProperties';
     public const string EXCLUDED_FIELDS = 'excludedFields';
     public const string INCLUDED_FIELD_TYPES = 'includedFieldTypes';
     public const string EXCLUDED_FIELD_TYPES = 'excludedFieldTypes';
@@ -97,6 +98,11 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public function includeId(bool $includeId = true)
     {
         return $this->with(self::INCLUDE_ID, $includeId);
+    }
+
+    public function includeProperties(bool $includeProperties = true)
+    {
+        return $this->with(self::INCLUDE_PROPERTIES, $includeProperties);
     }
 
     /** @param string[] $excludedFields */
