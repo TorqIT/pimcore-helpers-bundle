@@ -47,7 +47,7 @@ class AssetMetadataNormalizer implements NormalizerInterface, DenormalizerInterf
         $metadata = new AssetMetadata();
         $metadata->setName($get('name'));
         $metadata->setLanguage($get('language'));
-        $assetType = AssetMetadataType::tryFromNullable($get('type')) ?? AssetMetadataType::INPUT;
+        $assetType = AssetMetadataType::tryFrom($get('type')) ?? AssetMetadataType::INPUT;
         $metadata->setType($assetType);
 
         $value = $get('data');
@@ -63,11 +63,30 @@ class AssetMetadataNormalizer implements NormalizerInterface, DenormalizerInterf
         return match ($type) {
             AssetMetadataType::ASSET => $this->assetRepository->getById((int)$value),
             AssetMetadataType::OBJECT => $this->objectRepository->getById((int)$value),
-            AssetMetadataType::DATE => $value ? Carbon::parse($value) : null,
+            AssetMetadataType::DATE, AssetMetadataType::DATETIME => $value ? Carbon::parse($value) : null,
             AssetMetadataType::CHECKBOX => (bool)$value,
+            AssetMetadataType::MULTISELECT => explode(',', $value),
+            AssetMetadataType::MANY_TO_MANY_RELATION => $this->deserializeManyToManyRelation($value),
             AssetMetadataType::DOCUMENT => throw new Exception('Asset metadata type `document` not yet supported.'),
             default => $value,
         };
+    }
+
+    private function deserializeManyToManyRelation(string $value)
+    {
+        $relations = json_decode($value);
+        $deserialized = [];
+        foreach ($relations as $relation) {
+            [$type, $id] = $relation;
+            if ($type === 'object') {
+                $deserialized[] = $this->objectRepository->getById($id);
+            } elseif ($type === 'asset') {
+                $deserialized[] = $this->assetRepository->getById($id);
+            } else {
+                throw new Exception("Asset metadata manyToManyRelation type `$type` not yet supported.");
+            }
+        }
+        return $deserialized;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

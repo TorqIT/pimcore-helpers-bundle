@@ -11,7 +11,9 @@ class AssetMetadata
     private string $name;
     private string $language;
     private AssetMetadataType $type;
-    private null|string|bool|AbstractObject|Asset|Carbon $data;
+
+    /** @var string|float|int|bool|null|Carbon|AbstractObject|Asset|string[]|AbstractObject[]|Asset[] */
+    private null|string|bool|AbstractObject|Asset|Carbon|array $data;
 
     public function getName()
     {
@@ -51,7 +53,8 @@ class AssetMetadata
         return $this->data;
     }
 
-    public function setData(null|string|bool|AbstractObject|Asset|Carbon $data)
+    /** @param string|float|int|bool|null|Carbon|AbstractObject|Asset|string[]|AbstractObject[]|Asset[] $data */
+    public function setData(null|string|bool|AbstractObject|Asset|Carbon|array $data)
     {
         $this->data = $data;
         return $this;
