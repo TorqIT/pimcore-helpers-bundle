@@ -23,15 +23,13 @@ class ImageNormalizer extends AssetNormalizer
     protected function getFullPath(Asset $data, ?string $format, array $context)
     {
         if (!$data instanceof Image) {
-            return parent::getFullPath($data, $format, $context);
+            return $data->getFullPath();
         }
+        
         $thumbnail = $this->utils->get(HelperContextBuilder::THUMBNAIL, $context);
-        $path = $thumbnail ? $data->getThumbnail($thumbnail)?->getPath() ?? $data->getFullPath() : $data->getFullPath();
-        if ($request = $this->requestStack->getCurrentRequest()) {
-            return $request->getSchemeAndHttpHost() . $path;
-        } else {
-            return $path;
-        }
 
+        return $thumbnail 
+            ? $data->getThumbnail($thumbnail)?->getPath() ?? $data->getFullPath() 
+            : $data->getFullPath();
     }
 }
