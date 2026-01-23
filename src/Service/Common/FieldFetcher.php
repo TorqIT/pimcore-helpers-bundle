@@ -61,9 +61,9 @@ class FieldFetcher
     {
         $object = $this->toObject($object);
         if ($object instanceof DataObject) {
-            return $object->getClass()->getFieldDefinition($field)->getFieldType();
+            return $object->getClass()->getFieldDefinition($field)?->getFieldType();
         } else {
-            return $object->getDefinition()->getFieldDefinition($field)->getFieldType();
+            return $object->getDefinition()->getFieldDefinition($field)?->getFieldType();
         }
     }
 

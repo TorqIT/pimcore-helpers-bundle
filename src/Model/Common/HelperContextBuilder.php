@@ -2,7 +2,6 @@
 
 namespace Torq\PimcoreHelpersBundle\Model\Common;
 
-use Locale;
 use Symfony\Component\Serializer\Context\Normalizer\AbstractNormalizerContextBuilder;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
@@ -23,14 +22,15 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public const string EXCLUDED_FIELDS = 'excludedFields';
     public const string INCLUDED_FIELD_TYPES = 'includedFieldTypes';
     public const string EXCLUDED_FIELD_TYPES = 'excludedFieldTypes';
+    public const string RELATIONS_AS_IDS = 'relationsAsIds';
 
     // Classification Store
-    public const GROUP_FILTER = 'groupFilter';
-    public const KEY_FILTERS = 'keyFilter';
+    public const string GROUP_FILTER = 'groupFilter';
+    public const string KEY_FILTERS = 'keyFilter';
 
     // Asset
-    public const THUMBNAIL = 'thumbnail';
-    public const IS_VALUE_SERIALIZED = 'isValueSerialized';
+    public const string THUMBNAIL = 'thumbnail';
+    public const string IS_VALUE_SERIALIZED = 'isValueSerialized';
 
     // Color
     public const string WITH_ALPHA = 'withAlpha';
@@ -139,6 +139,11 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     {
         $existingExclusions = $this->toArray()[self::EXCLUDED_FIELD_TYPES] ?? [];
         return $this->with(self::EXCLUDED_FIELD_TYPES, [...$existingExclusions, $type]);
+    }
+
+    public function relationsAsIds(bool $relationsAsIds = true)
+    {
+        return $this->with(self::RELATIONS_AS_IDS, $relationsAsIds);
     }
 
     public function withGroupFilter(callable $fn)

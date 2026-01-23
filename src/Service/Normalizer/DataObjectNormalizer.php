@@ -14,7 +14,7 @@ use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class DataObjectNormalizer extends AbstractObjectNormalizer
 {
-    private const DEFAULT_CHILD_TYPES = [
+    private const array DEFAULT_CHILD_TYPES = [
         AbstractObject::OBJECT_TYPE_OBJECT,
         AbstractObject::OBJECT_TYPE_VARIANT,
         AbstractObject::OBJECT_TYPE_FOLDER,
@@ -49,8 +49,13 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
 
     protected function getFields(object $data, ?string $format = null, array $context = []): array
     {
-        $context = HelperContextBuilder::create()->withContext($context)->addExcludedFieldType('reverseObjectRelation');
-        return parent::getFields($data, context: $context->toArray());
+        $relationsAsIds = $this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context);
+        if (!$relationsAsIds) {
+            $context = HelperContextBuilder::create()->withContext($context);
+            $context = $context->addExcludedFieldType('reverseObjectRelation');
+            $context = $context->toArray();
+        }
+        return parent::getFields($data, context: $context);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

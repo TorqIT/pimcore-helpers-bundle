@@ -6,7 +6,7 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class MD5Encoder extends JsonEncoder implements EncoderInterface {
-    public const FORMAT = 'md5';
+    public const string FORMAT = 'md5';
 
     public function encode(mixed $data, string $format, array $context = []): string
     {
