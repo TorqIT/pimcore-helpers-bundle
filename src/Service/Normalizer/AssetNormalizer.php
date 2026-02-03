@@ -34,7 +34,7 @@ class AssetNormalizer implements NormalizerInterface
     ): array|string|int|float|bool|ArrayObject|null {
         $output = new stdClass();
         $output->id = $data->getId();
-        $output->fullPath = $data->getFullPath();
+        $output->fullPath = $this->getFullPath($data, $format, $context);
         $output->fileName = $data->getKey();
         $output->mimeType = $data->getMimeType();
         $output->fileType = $data->getType();
@@ -52,6 +52,11 @@ class AssetNormalizer implements NormalizerInterface
     public function getSupportedTypes(?string $format): array
     {
         return [Asset::class => false];
+    }
+
+    protected function getFullPath(Asset $data, ?string $format, array $context)
+    {
+        return $data->getFullPath();
     }
 
     /** @param AssetMetadata[] $metadata */
