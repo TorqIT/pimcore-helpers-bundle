@@ -28,8 +28,7 @@ class ImageNormalizer extends AssetNormalizer
         
         $thumbnail = $this->utils->get(HelperContextBuilder::THUMBNAIL, $context);
 
-        return $thumbnail 
-            ? $data->getThumbnail($thumbnail)?->getPath() ?? $data->getFullPath() 
+        return $thumbnail ? $data->getThumbnail($thumbnail)?->getFrontendPath() ?? $data->getFullPath()
             : $data->getFullPath();
     }
 }
