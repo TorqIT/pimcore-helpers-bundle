@@ -8,16 +8,16 @@ use Pimcore\Model\DataObject\Classificationstore;
 use Pimcore\Model\DataObject\Classificationstore\GroupConfig;
 use Pimcore\Model\DataObject\Classificationstore\KeyConfig;
 use stdClass;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Repository\GroupRepository;
 use Torq\PimcoreHelpersBundle\Repository\KeyRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
-use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
-#[AutoconfigureTag('serializer.normalizer.torq.classification_store')]
+#[AsAlias('torq.normalizer.classification_store', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class ClassificationStoreNormalizer implements NormalizerInterface
 {

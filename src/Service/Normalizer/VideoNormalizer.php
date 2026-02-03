@@ -4,15 +4,16 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Pimcore\Model\DataObject\Data\Video;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[AutoconfigureTag('serializer.normalizer.torq.video')]
+#[AsAlias('torq.normalizer.video', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class VideoNormalizer implements NormalizerInterface
 {
-    public function __construct(private AssetNormalizer $assetNormalizer)
+    public function __construct(#[Autowire(service: 'torq.normalizer.asset')] private AssetNormalizer $assetNormalizer)
     {
     }
 

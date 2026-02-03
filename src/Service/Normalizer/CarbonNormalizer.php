@@ -4,15 +4,13 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Carbon\Carbon;
-use Exception;
-use Pimcore\Model\DataObject\Data\Video;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
+use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
-#[AutoconfigureTag('serializer.normalizer.torq.carbon')]
+#[AsAlias('torq.normalizer.carbon', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class CarbonNormalizer implements NormalizerInterface
 {

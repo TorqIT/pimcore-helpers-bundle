@@ -6,11 +6,11 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Concrete as DataObject;
 use stdClass;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 
-#[AutoconfigureTag('serializer.normalizer.torq.data_object')]
+#[AsAlias('torq.normalizer.data_object', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class DataObjectNormalizer extends AbstractObjectNormalizer
 {

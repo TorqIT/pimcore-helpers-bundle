@@ -4,11 +4,11 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Pimcore\Model\DataObject\Data\UrlSlug;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[AutoconfigureTag('serializer.normalizer.torq.url_slug')]
+#[AsAlias('torq.normalizer.url_slug', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class UrlSlugNormalizer implements NormalizerInterface
 {

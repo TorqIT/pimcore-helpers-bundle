@@ -4,16 +4,18 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Carbon\CarbonPeriod;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
-#[AutoconfigureTag('serializer.normalizer.torq.carbon_period')]
+#[AsAlias('torq.normalizer.carbon_period', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class CarbonPeriodNormalizer implements NormalizerInterface
 {
-    public function __construct(private CarbonNormalizer $carbonNormalizer)
+    public function __construct(
+        #[Autowire(service: 'torq.normalizer.carbon')] private CarbonNormalizer $carbonNormalizer,
+    )
     {
     }
 

@@ -4,11 +4,12 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Pimcore\Model\DataObject\Data\Link;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[AutoconfigureTag('serializer.normalizer.torq.link')]
+#[AsAlias('torq.normalizer.link', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class LinkNormalizer implements NormalizerInterface
 {

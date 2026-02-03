@@ -4,15 +4,16 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Pimcore\Model\DataObject\Data\Hotspotimage;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[AutoconfigureTag('serializer.normalizer.torq.hotspot_image')]
+#[AsAlias('torq.normalizer.hotspot_image', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class HotspotImageNormalizer implements NormalizerInterface
 {
-    public function __construct(private AssetNormalizer $assetNormalizer)
+    public function __construct(#[Autowire(service: 'torq.normalizer.image')] private ImageNormalizer $imageNormalizer)
     {
     }
 
@@ -23,7 +24,7 @@ class HotspotImageNormalizer implements NormalizerInterface
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
         $image = $data?->getImage();
-        return $image !== null ? $this->assetNormalizer->normalize($image, $format, $context) : null;
+        return $image !== null ? $this->imageNormalizer->normalize($image, $format, $context) : null;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

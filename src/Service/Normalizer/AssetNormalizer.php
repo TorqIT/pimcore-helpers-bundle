@@ -5,8 +5,8 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 use ArrayObject;
 use Pimcore\Model\Asset;
 use stdClass;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -14,7 +14,7 @@ use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
 use Torq\PimcoreHelpersBundle\Repository\AssetMetadataRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
-#[AutoconfigureTag('serializer.normalizer.torq.asset')]
+#[AsAlias('torq.normalizer.asset', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -2]])]
 class AssetNormalizer implements NormalizerInterface
 {
