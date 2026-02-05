@@ -5,17 +5,18 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 use ArrayObject;
 use InvalidArgumentException;
 use Pimcore\Model\Property;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[AutoconfigureTag('serializer.normalizer.torq.property')]
+#[AsAlias('torq.normalizer.property', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class PropertyNormalizer implements NormalizerInterface
 {
     public function __construct(
-        private DataObjectNormalizer $dataObjectNormalizer,
-        private AssetNormalizer $assetNormalizer,
+        #[Autowire(service: 'torq.normalizer.data_object')] private DataObjectNormalizer $dataObjectNormalizer,
+        #[Autowire(service: 'torq.normalizer.asset')] private AssetNormalizer $assetNormalizer,
     ) {}
 
     /** @param Property $data */

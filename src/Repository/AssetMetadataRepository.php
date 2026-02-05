@@ -2,16 +2,16 @@
 
 namespace Torq\PimcoreHelpersBundle\Repository;
 
+use Doctrine\DBAL\Connection;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\AssetMetadataNormalizer;
-use Doctrine\DBAL\Connection;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class AssetMetadataRepository
 {
     public function __construct(
-        private AssetMetadataNormalizer $normalizer,
+        #[Autowire(service: 'torq.normalizer.asset_metadata')] private AssetMetadataNormalizer $normalizer,
         private Connection $connection,
     ) {
     }

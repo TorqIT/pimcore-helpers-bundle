@@ -5,12 +5,13 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 use ArrayObject;
 use Pimcore\Model\DataObject\Listing\Concrete as Listing;
 use stdClass;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-#[AutoconfigureTag('serializer.normalizer.torq.listing')]
+#[AsAlias('torq.normalizer.listing', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class ListingNormalizer implements NormalizerInterface
 {

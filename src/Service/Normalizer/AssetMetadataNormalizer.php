@@ -5,8 +5,8 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 use ArrayObject;
 use Carbon\Carbon;
 use Exception;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -18,7 +18,7 @@ use Torq\PimcoreHelpersBundle\Repository\AssetRepository;
 use Torq\PimcoreHelpersBundle\Repository\DataObjectRepository;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
-#[AutoconfigureTag('serializer.normalizer.torq.asset_metadata')]
+#[AsAlias('torq.normalizer.asset_metadata', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class AssetMetadataNormalizer implements NormalizerInterface, DenormalizerInterface
 {
