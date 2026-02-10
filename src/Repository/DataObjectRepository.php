@@ -6,9 +6,9 @@ use Pimcore\Model\DataObject\AbstractObject;
 
 class DataObjectRepository
 {
-    public function getById(?int $id)
+    public function getById(?int $id = null, array $params = [])
     {
-        return $id !== null ? AbstractObject::getById($id) : null;
+        return $id !== null ? AbstractObject::getById($id, $params) : null;
     }
 
     /**
@@ -16,9 +16,9 @@ class DataObjectRepository
      * @param T $object
      * @return T
      */
-    public function save(AbstractObject $object)
+    public function save(AbstractObject $object, array $parameters = [])
     {
-        return $object->save();
+        return $object->save($parameters);
     }
 
     public function delete(AbstractObject $object)
