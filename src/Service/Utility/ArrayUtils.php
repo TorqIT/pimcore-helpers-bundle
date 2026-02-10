@@ -104,7 +104,7 @@ class ArrayUtils
     {
         return array_values(array_reduce($array, function ($carry, $item) use ($fn) {
             $key = $fn($item);
-            if (!key_exists($carry, $key)) {
+            if (!key_exists($key, $carry)) {
                 $carry[$key] = $item;
             }
             return $carry;
