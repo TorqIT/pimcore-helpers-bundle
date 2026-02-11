@@ -13,6 +13,7 @@ A collection of several simple but commonly used, mockable service wrappers
   - `findIndex(callable $callable, array $array)` and `findInArray(callable $callable, array $array)` functions, which find an item in an array based on a given function
 
 
+
 # License
 
 This bundle is licensed under the Pimcore Open Core License (POCL)
