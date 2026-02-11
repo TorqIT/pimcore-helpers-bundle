@@ -14,7 +14,6 @@ A collection of several simple but commonly used, mockable service wrappers
 
 # License
 
-
 This bundle is licensed under the Pimcore Open Core License (POCL)
 and is intended for use with Pimcore Platform 2025.1 and newer.
 
