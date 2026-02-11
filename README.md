@@ -11,3 +11,11 @@ A collection of several simple but commonly used, mockable service wrappers
     - `getInt()`
     - `getFloat()`
   - `findIndex(callable $callable, array $array)` and `findInArray(callable $callable, array $array)` functions, which find an item in an array based on a given function
+
+# License
+
+This bundle is licensed under the Pimcore Open Core License (POCL)
+and is intended for use with Pimcore Platform 2025.1 and newer.
+
+See LICENSE.md for full license text.
+
