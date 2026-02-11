@@ -1,7 +1,7 @@
 {
     "name": "torq/pimcore-helpers-bundle",
     "type": "pimcore-bundle",
-    "license": "POCL",
+    "license": "proprietary",
     "version": "2.0.0",
     "require": {
         "pimcore/pimcore": "^11.0 || ^12.0",
