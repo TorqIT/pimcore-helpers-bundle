@@ -6,6 +6,8 @@ use Pimcore\Model\DataObject\AbstractObject;
 
 class DataObjectRepository
 {
+    use QueryHelpersTrait;
+
     public function getById(?int $id = null, array $params = [])
     {
         return $id !== null ? AbstractObject::getById($id, $params) : null;

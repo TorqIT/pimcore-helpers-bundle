@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AssetRepository
 {
+    use QueryHelpersTrait;
+
     public function __construct(private FolderRepository $folderRepository) {}
 
     public function getById(int $id): ?Asset
