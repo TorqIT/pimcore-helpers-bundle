@@ -28,9 +28,9 @@ class AssetRepository
         return Asset::getByPath($path);
     }
 
-    public function save(Asset $asset): Asset
+    public function save(Asset $asset, array $parameters = []): Asset
     {
-        return $asset->save();
+        return $asset->save($parameters);
     }
 
     public function delete(Asset $asset)
