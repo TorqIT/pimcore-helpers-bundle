@@ -35,6 +35,12 @@ class AssetRepository
         return $asset->save($parameters);
     }
 
+    public function saveScheduledTasks(Asset $asset)
+    {
+        $asset->saveScheduledTasks();
+        return $asset;
+    }
+
     public function delete(Asset $asset)
     {
         $asset->delete();

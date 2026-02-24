@@ -2,7 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Repository;
 
-use Pimcore\Model\DataObject\AbstractObject;
+use Pimcore\Model\DataObject\Concrete;
 
 class DataObjectRepository
 {
@@ -10,20 +10,31 @@ class DataObjectRepository
 
     public function getById(?int $id = null, array $params = [])
     {
-        return $id !== null ? AbstractObject::getById($id, $params) : null;
+        return $id !== null ? Concrete::getById($id, $params) : null;
     }
 
     /**
-     * @template-covariant T of AbstractObject
+     * @template-covariant T of Concrete
      * @param T $object
      * @return T
      */
-    public function save(AbstractObject $object, array $parameters = [])
+    public function save(Concrete $object, array $parameters = [])
     {
         return $object->save($parameters);
     }
 
-    public function delete(AbstractObject $object)
+    /**
+     * @template-covariant T of Concrete
+     * @param T $object
+     * @return T
+     */
+    public function saveScheduledTasks(Concrete $object)
+    {
+        $object->saveScheduledTasks();
+        return $object;
+    }
+
+    public function delete(Concrete $object)
     {
         $object->delete();
     }
