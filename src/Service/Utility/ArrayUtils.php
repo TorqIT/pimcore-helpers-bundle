@@ -94,6 +94,23 @@ class ArrayUtils
         return true;
     }
 
+    /**
+     * @template T
+     * @param T[] $array
+     * @param callable(T): string $fn
+     * @return T[]
+     */
+    public function unique(array $array, callable $fn): array
+    {
+        return array_values(array_reduce($array, function ($carry, $item) use ($fn) {
+            $key = $fn($item);
+            if (!key_exists($key, $carry)) {
+                $carry[$key] = $item;
+            }
+            return $carry;
+        }, []));
+    }
+
     public function findInArray(callable $callable, ?array $array)
     {
         $index = $this->findIndex($callable, $array);

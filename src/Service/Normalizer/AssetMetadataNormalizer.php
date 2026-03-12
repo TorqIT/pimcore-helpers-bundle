@@ -1,0 +1,110 @@
+<?php
+
+namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
+
+use ArrayObject;
+use Carbon\Carbon;
+use Exception;
+use Symfony\Component\DependencyInjection\Attribute\AsAlias;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
+use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadataType;
+use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
+use Torq\PimcoreHelpersBundle\Repository\AssetRepository;
+use Torq\PimcoreHelpersBundle\Repository\DataObjectRepository;
+use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
+
+#[AsAlias('torq.normalizer.asset_metadata', public: true)]
+#[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
+class AssetMetadataNormalizer implements NormalizerInterface, DenormalizerInterface
+{
+    public function __construct(
+        #[Autowire(service: 'serializer.normalizer.object')] private ObjectNormalizer $normalizer,
+        private DataObjectRepository $objectRepository,
+        private AssetRepository $assetRepository,
+        private ArrayUtils $utils,
+    ) {
+    }
+
+    /** @param AssetMetadata $data */
+    public function normalize(
+        mixed $data,
+        ?string $format = null,
+        array $context = []
+    ): array|string|int|float|bool|ArrayObject|null {
+        return $this->normalizer->normalize($data, $format, $context);
+    }
+
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    {
+        $get = fn(string $key) => $this->utils->get($key, $data);
+        $isValueSerialized = $this->utils->get(HelperContextBuilder::IS_VALUE_SERIALIZED, $context, false);
+
+        $metadata = new AssetMetadata();
+        $metadata->setName($get('name'));
+        $metadata->setLanguage($get('language'));
+        $assetType = AssetMetadataType::tryFrom($get('type')) ?? AssetMetadataType::INPUT;
+        $metadata->setType($assetType);
+
+        $value = $get('data');
+        if ($isValueSerialized) {
+            $value = $this->deserializeValue($value, $assetType);
+        }
+        $metadata->setData($value);
+        return $metadata;
+    }
+
+    protected function deserializeValue(mixed $value, AssetMetadataType $type)
+    {
+        return match ($type) {
+            AssetMetadataType::ASSET => $this->assetRepository->getById((int)$value),
+            AssetMetadataType::OBJECT => $this->objectRepository->getById((int)$value),
+            AssetMetadataType::DATE, AssetMetadataType::DATETIME => $value ? Carbon::parse($value) : null,
+            AssetMetadataType::CHECKBOX => (bool)$value,
+            AssetMetadataType::MULTISELECT => explode(',', $value),
+            AssetMetadataType::MANY_TO_MANY_RELATION => $this->deserializeManyToManyRelation($value),
+            AssetMetadataType::DOCUMENT => throw new Exception('Asset metadata type `document` not yet supported.'),
+            default => $value,
+        };
+    }
+
+    private function deserializeManyToManyRelation(string $value)
+    {
+        $relations = json_decode($value);
+        $deserialized = [];
+        foreach ($relations as $relation) {
+            [$type, $id] = $relation;
+            if ($type === 'object') {
+                $deserialized[] = $this->objectRepository->getById($id);
+            } elseif ($type === 'asset') {
+                $deserialized[] = $this->assetRepository->getById($id);
+            } else {
+                throw new Exception("Asset metadata manyToManyRelation type `$type` not yet supported.");
+            }
+        }
+        return $deserialized;
+    }
+
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+    {
+        return $data instanceof AssetMetadata;
+    }
+
+    public function supportsDenormalization(
+        mixed $data,
+        string $type,
+        ?string $format = null,
+        array $context = []
+    ): bool {
+        return is_array($data) && $type === AssetMetadata::class;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [AssetMetadata::class => true];
+    }
+}

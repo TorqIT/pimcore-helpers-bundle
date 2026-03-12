@@ -2,6 +2,7 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
+use ArrayObject;
 use InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -12,35 +13,27 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
     {
     }
 
+    abstract protected function convertToDto(mixed $object, ?string $format = null, array $context = []);
+
+    abstract public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool;
+
+    abstract public function getSupportedTypes(?string $format): array;
+
     /** @param mixed|array $object */
-    public function toDto(mixed $object)
+    public function toDto(mixed $object, ?string $format = null, array $context = [])
     {
         if (!$object) {
             return null;
         } elseif (is_array($object)) {
-            return array_map([$this, 'convertToDto'], $object);
+            return array_map(fn($o) => $this->convertToDto($o, $format, $context), $object);
         } else {
-            return $this->convertToDto($object);
+            return $this->convertToDto($object, $format, $context);
         }
     }
 
-    abstract protected function convertToDto(mixed $object);
-
-    protected function validateObjectType(mixed $object, ?string $format = null)
+    public function normalize(mixed $object, ?string $format = null, array $context = []): ArrayObject|array|string|int|float|bool|null
     {
-        if ($object !== null && !$this->supportsNormalization($object, $format)) {
-            throw new InvalidArgumentException(
-                'object of type ' .
-                    get_debug_type($object) .
-                    ' must one of the following types: ' .
-                    implode(', ', $this->getSupportedTypes($format))
-            );
-        }
-    }
-
-    public function normalize(mixed $object, ?string $format = null, array $context = [])
-    {
-        $dto = $this->toDto($object);
+        $dto = $this->toDto($object, $format, $context);
         if (is_array($dto)) {
             return array_map(fn(object $o) => $this->objectNormalizer->normalize($o, $format, $context), $dto);
         } elseif (is_scalar($object) || is_object($object)) {
@@ -48,6 +41,18 @@ abstract class AbstractDtoNormalizer implements NormalizerInterface
         } else {
             throw new InvalidArgumentException(
                 'object of type: ' . get_debug_type($object) . ' must be either scalar, an object, or an array'
+            );
+        }
+    }
+
+    protected function validateObjectType(mixed $object, ?string $format = null, array $context = [])
+    {
+        if ($object !== null && !$this->supportsNormalization($object, $format)) {
+            throw new InvalidArgumentException(
+                'object of type ' .
+                    get_debug_type($object) .
+                    ' must one of the following types: ' .
+                    implode(', ', array_keys($this->getSupportedTypes($format)))
             );
         }
     }
