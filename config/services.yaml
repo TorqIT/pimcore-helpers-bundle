@@ -19,6 +19,13 @@ services:
         resource: '../src/Repository'
         public: true
 
+    pimcore.data_object.grid_column_config.operator.factory.classification_store_key_getter:
+        class: Pimcore\Bundle\AdminBundle\DataObject\GridColumnConfig\Operator\Factory\DefaultOperatorFactory
+        arguments:
+            $className: Torq\PimcoreHelpersBundle\GridColumnConfig\Operator\ClassificationStoreKeyGetter
+        tags:
+            - { name: pimcore.data_object.grid_column_config.operator_factory, id: ClassificationStoreKeyGetter }
+
 # add more services, or override services that need manual wiring
 #    Torq\PimcoreHelpersBundle\ExampleClass:
 #        arguments:
