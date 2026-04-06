@@ -2,7 +2,6 @@
     "name": "torq/pimcore-helpers-bundle",
     "type": "pimcore-bundle",
     "license": "proprietary",
-    "version": "2.0.0",
     "require": {
         "pimcore/pimcore": "^11.0 || ^12.0",
         "symfony/serializer-pack": "^v1.3.0",
