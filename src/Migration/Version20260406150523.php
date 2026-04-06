@@ -24,7 +24,7 @@ final class Version20260406150523 extends AbstractMigration
         $table = $schema->createTable(self::TABLE_NAME);
         $table->addColumn('name', 'string', ['length' => 255, 'notnull' => true]);
         $table->addColumn('executed_at', 'date', ['notnull' => true]);
-        $table->addColumn('repeatable', 'boolean', ['notnull' => true, 'default' => false]);
+        $table->addUniqueIndex(['name'], 'uniq_startup_command_name');
     }
 
     public function down(Schema $schema): void
