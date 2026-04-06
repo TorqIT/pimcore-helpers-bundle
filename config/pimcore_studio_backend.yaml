@@ -1,0 +1,4 @@
+pimcore_studio_backend:
+    data_object_data_adapter_mapping:
+        Torq\PimcoreHelpersBundle\DataObject\Data\Adapter\ArrayFieldAdapter:
+            - "arrayField"
