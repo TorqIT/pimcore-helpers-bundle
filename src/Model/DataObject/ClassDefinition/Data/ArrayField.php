@@ -223,7 +223,7 @@ class ArrayField extends Data implements
         if ($object instanceof Concrete) {
             $table = 'object_store_' . $object->getClassId();
             $db->update($table, [
-                $this->getName() => $this->getDataForResource($data, $object, $params)
+                $db->quoteIdentifier($this->getName()) => $this->getDataForResource($data, $object, $params)
             ], ['oo_id' => $object->getId()]);
         }
     }
@@ -235,7 +235,7 @@ class ArrayField extends Data implements
             $table = 'object_store_' . $object->getClassId();
 
             $result = $db->fetchOne(
-                'SELECT ' . $this->getName() . ' FROM ' . $table . ' WHERE oo_id = ?',
+                'SELECT ' . $db->quoteIdentifier($this->getName()) . ' FROM ' . $db->quoteIdentifier($table) . ' WHERE oo_id = ?',
                 [$object->getId()]
             );
 

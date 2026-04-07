@@ -165,7 +165,7 @@ pimcore.object.tags.arrayField = Class.create(pimcore.object.tags.abstract, {
         this.component.add(itemContainer);
         this.component.updateLayout();
 
-        if (!isReadOnlyView && value !== null && value !== undefined) {
+        if (!isReadOnlyView && (value === null || value === undefined)) {
             this.dirty = true;
         }
     },
