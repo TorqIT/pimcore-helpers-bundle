@@ -25,6 +25,13 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreB
         $container->addCompilerPass(new ArrayFieldTypeRegistrationPass());
     }
 
+    public function getCssPaths(): array
+    {
+        return [
+            '/bundles/torqpimcorehelpers/css/arrayField.css'
+        ];
+    }
+
     public function getJsPaths(): array
     {
         return [
