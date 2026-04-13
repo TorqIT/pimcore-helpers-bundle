@@ -1,0 +1,10 @@
+services:
+    Torq\PimcoreHelpersBundle\Grid\Column\Definition\DataObject\ArrayFieldDefinition:
+        tags:
+            - { name: 'pimcore.studio_backend.grid_column_definition' }
+
+    Torq\PimcoreHelpersBundle\Grid\Column\Resolver\DataObject\ArrayFieldResolver:
+        tags:
+            - { name: 'pimcore.studio_backend.grid_column_resolver' }
+
+    Torq\PimcoreHelpersBundle\DataObject\Data\Adapter\ArrayFieldAdapter: ~
