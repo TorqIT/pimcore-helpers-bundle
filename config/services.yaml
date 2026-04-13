@@ -9,8 +9,14 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: false
 
-    # controllers are imported separately to make sure they're public
-    # and have a tag that allows actions to type-hint services
+    Torq\PimcoreHelpersBundle\Attribute\:
+      resource: '../src/Attribute'
+      public: true
+
+    Torq\PimcoreHelpersBundle\Command\:
+      resource: '../src/Command'
+      public: true
+
     Torq\PimcoreHelpersBundle\Service\:
         resource: '../src/Service'
         public: true
@@ -25,10 +31,3 @@ services:
             $className: Torq\PimcoreHelpersBundle\GridColumnConfig\Operator\ClassificationStoreKeyGetter
         tags:
             - { name: pimcore.data_object.grid_column_config.operator_factory, id: ClassificationStoreKeyGetter }
-
-# add more services, or override services that need manual wiring
-#    Torq\PimcoreHelpersBundle\ExampleClass:
-#        arguments:
-#            - "@service_id"
-#            - "plain_value"
-#            - "%parameter%"
