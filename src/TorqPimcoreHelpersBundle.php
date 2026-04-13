@@ -14,16 +14,6 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreB
 {
     use BundleAdminClassicTrait;
 
-    public function getJsPaths(): array
-    {
-        return [
-            '/bundles/torqpimcorehelpers/ClassificationStoreKeyGetter.js',
-            '/bundles/torqpimcorehelpers/dynamic-localized-field.js',
-            '/bundles/torqpimcorehelpers/symfonyExpression.js',
-            '/bundles/torqpimcorehelpers/toClassificationStoreKeyValuePair.js',
-        ];
-    }
-
     public function getPath(): string
     {
         return \dirname(__DIR__);
@@ -47,6 +37,10 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreB
         return [
             '/bundles/torqpimcorehelpers/js/pimcore/object/classes/data/arrayField.js',
             '/bundles/torqpimcorehelpers/js/pimcore/object/tags/arrayField.js',
+            '/bundles/torqpimcorehelpers/ClassificationStoreKeyGetter.js',
+            '/bundles/torqpimcorehelpers/dynamic-localized-field.js',
+            '/bundles/torqpimcorehelpers/symfonyExpression.js',
+            '/bundles/torqpimcorehelpers/toClassificationStoreKeyValuePair.js',
         ];
     }
 }
