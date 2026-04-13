@@ -9,10 +9,12 @@ use Pimcore\Extension\Bundle\PimcoreBundleAdminClassicInterface;
 use Pimcore\Extension\Bundle\Traits\BundleAdminClassicTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ArrayFieldTypeRegistrationPass;
+use Torq\PimcoreHelpersBundle\Service\Common\BundleAssetResolverTrait;
 
 class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreBundleAdminClassicInterface
 {
     use BundleAdminClassicTrait;
+    use BundleAssetResolverTrait;
 
     public function getPath(): string
     {
@@ -27,16 +29,13 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreB
 
     public function getCssPaths(): array
     {
-        return [
-            '/bundles/torqpimcorehelpers/css/arrayField.css'
-        ];
+        $paths = $this->getBundleAssetPaths($this->getPath() . '/public/css', 'css');
+        return array_map(fn($p) => "/bundles/torqpimcorehelpers/$p", $paths);
     }
 
     public function getJsPaths(): array
     {
-        return [
-            '/bundles/torqpimcorehelpers/js/pimcore/object/classes/data/arrayField.js',
-            '/bundles/torqpimcorehelpers/js/pimcore/object/tags/arrayField.js',
-        ];
+        $paths = $this->getBundleAssetPaths($this->getPath() . '/public/js', 'js');
+        return array_map(fn($p) => "/bundles/torqpimcorehelpers/$p", $paths);
     }
 }
