@@ -25,7 +25,10 @@ class FieldFetcher
         bool $includeProperties = false,
         array $excludedFields = [],
         ?array $includedFieldTypes = null,
-        array $excludedFieldTypes = []
+        array $excludedFieldTypes = [],
+        bool $onlyMandatory = false,
+        bool $onlyUnique = false,
+        bool $onlyIndexed = false,
     ): array {
         $object = $this->toObject($object);
         $fields = $this->getFieldsFromFieldConsts($object::class);
@@ -47,6 +50,15 @@ class FieldFetcher
         if ($object instanceof DataObject && $includeProperties) {
             $fields[] = 'properties';
         }
+        if ($onlyMandatory) {
+            $fields = array_filter($fields, fn($f) => $this->getFieldDefinition($object, $f)->getMandatory());
+        }
+        if ($onlyUnique) {
+            $fields = array_filter($fields, fn($f) => $this->getFieldDefinition($object, $f)->getUnique());
+        }
+        if ($onlyIndexed) {
+            $fields = array_filter($fields, fn($f) => $this->getFieldDefinition($object, $f)->getIndex());
+        }
         return $fields;
     }
 
@@ -57,14 +69,19 @@ class FieldFetcher
         return in_array($field, $fields);
     }
 
-    public function getFieldDefinitionType(DataObject|FCData|BrickData|string $object, string $field)
+    public function getFieldDefinition(DataObject|FCData|BrickData|string $object, string $field)
     {
         $object = $this->toObject($object);
         if ($object instanceof DataObject) {
-            return $object->getClass()->getFieldDefinition($field)?->getFieldType();
+            return $object->getClass()->getFieldDefinition($field);
         } else {
-            return $object->getDefinition()->getFieldDefinition($field)?->getFieldType();
+            return $object->getDefinition()->getFieldDefinition($field);
         }
+    }
+
+    public function getFieldDefinitionType(DataObject|FCData|BrickData|string $object, string $field)
+    {
+        return $this->getFieldDefinition($object, $field)?->getFieldType();
     }
 
     private function toObject(DataObject|FCData|BrickData|string $object): DataObject|FCData|BrickData
