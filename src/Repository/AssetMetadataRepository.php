@@ -16,7 +16,7 @@ class AssetMetadataRepository
     ) {
     }
 
-    public function getByAssetId(?int $assetId)
+    public function getForAssetId(?int $assetId)
     {
         if ($assetId === null) {
             return [];
@@ -27,6 +27,23 @@ class AssetMetadataRepository
         $qb->where('cid = :assetId')->setParameter('assetId', $assetId);
         $data = $qb->executeQuery()->fetchAllAssociative();
         return array_map(fn(array $d) => $this->hydrate($d), $data);
+    }
+
+    public function getByName(?int $assetId, ?string $name): ?AssetMetadata
+    {
+        if ($assetId === null || $name === null) {
+            return null;
+        }
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('*')->from('assets_metadata', 'metadata');
+        $qb->where('cid = :assetId')->setParameter('assetId', $assetId);
+        $qb->andWhere('name = :name')->setParameter('name', $name);
+        if ($data = $qb->executeQuery()->fetchAllAssociative()[0] ?? null) {
+            return $this->hydrate($data);
+        } else {
+            return null;
+        }
     }
 
     /**

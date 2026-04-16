@@ -39,7 +39,7 @@ class AssetNormalizer implements NormalizerInterface
         $output->mimeType = $data->getMimeType();
         $output->fileType = $data->getType();
         $output->fileSize = $data->getFileSize(formatted: true);
-        $metadata = $this->metadataRepository->getByAssetId($data->getId());
+        $metadata = $this->metadataRepository->getForAssetId($data->getId());
         $output->metadata = count($metadata) > 0 ? $this->convertAssetMetadataToObject($metadata) : null;
         return $this->normalizer->normalize($output, $format, $context);
     }

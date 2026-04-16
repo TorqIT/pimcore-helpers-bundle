@@ -1,0 +1,6 @@
+pimcore:
+    objects:
+        class_definitions:
+            data:
+                map:
+                    arrayField: Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\ArrayField
