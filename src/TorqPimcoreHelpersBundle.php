@@ -9,6 +9,7 @@ use Pimcore\Extension\Bundle\PimcoreBundleAdminClassicInterface;
 use Pimcore\Extension\Bundle\Traits\BundleAdminClassicTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ArrayFieldTypeRegistrationPass;
+use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\HashedInputTypeRegistrationPass;
 use Torq\PimcoreHelpersBundle\Service\Common\BundleAssetResolverTrait;
 
 class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreBundleAdminClassicInterface
@@ -25,6 +26,7 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreB
     {
         parent::build($container);
         $container->addCompilerPass(new ArrayFieldTypeRegistrationPass());
+        $container->addCompilerPass(new HashedInputTypeRegistrationPass());
     }
 
     public function getCssPaths(): array
