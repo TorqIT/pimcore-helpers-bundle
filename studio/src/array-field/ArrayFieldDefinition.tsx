@@ -4,15 +4,15 @@ import { DynamicTypeFieldDefinitionDataAbstract } from "@pimcore/studio-ui-bundl
 import { type ElementIcon } from "@pimcore/studio-ui-bundle/modules/widget-manager";
 
 @injectable()
-export class HashedinputFieldDefinition extends DynamicTypeFieldDefinitionDataAbstract {
-    id: string = "hashedInput";
+export class ArrayFieldDefinition extends DynamicTypeFieldDefinitionDataAbstract {
+    id: string = "arrayField";
 
     getIcon(): ElementIcon {
-        return { type: "name", value: "lock" };
+        return { type: "name", value: "transformers" };
     }
 
     getGroup(): string[] {
-        return [...super.getGroup(), "text"];
+        return [...super.getGroup(), "structured"];
     }
 
     getSpecificFormFields(): React.JSX.Element {
