@@ -8,24 +8,22 @@ use Pimcore\Bundle\StudioBackendBundle\Grid\Column\Definition\DataObject\Abstrac
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag(name: 'pimcore.studio_backend.grid_column_definition')]
-final readonly class ArrayFieldDefinition extends AbstractDefinition
+final readonly class HashedInputDefinition extends AbstractDefinition
 {
     public function getType(): string
     {
-        return 'data-object.arrayField';
+        return 'data-object.hashedInput';
     }
 
     public function getFrontendType(): string
     {
-        return 'arrayField';
+        return 'hashedInput';
     }
 
     public function getConfig(mixed $config): array
     {
         return [
             'elementType' => $config['elementType'] ?? 'input',
-            'maxItems' => $config['maxItems'] ?? null,
-            'removeDuplicates' => $config['removeDuplicates'] ?? false,
         ];
     }
 
@@ -36,12 +34,12 @@ final readonly class ArrayFieldDefinition extends AbstractDefinition
 
     public function isFilterable(): bool
     {
-        return true;
+        return false;
     }
 
     public function isExportable(): bool
     {
-        return true;
+        return false;
     }
 
     public function isEditable(): bool
