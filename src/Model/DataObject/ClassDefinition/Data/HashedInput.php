@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data;
 
+use Pimcore;
 use Pimcore\Model\DataObject\ClassDefinition\Data\Input;
 use Pimcore\Model\DataObject\Concrete;
+use RuntimeException;
 
 /**
  * One-way hashed string field using Argon2id with an HMAC-derived deterministic salt.
@@ -72,11 +74,15 @@ class HashedInput extends Input
 
     private function computeHash(string $plaintext): string
     {
-        // FIXME: Any alternatives to coupling field definition to container?
-        $secret = \Pimcore::getContainer()->getParameter('secret');
+        $container = Pimcore::getContainer();
+        if (!$container->hasParameter('torq_pimcore_helpers.secret')) {
+            throw new RuntimeException(
+                'HashedInput requires the "torq_pimcore_helpers.secret" container parameter to be set.'
+            );
+        }
 
+        $secret = $container->getParameter('torq_pimcore_helpers.secret');
         $salt = substr(hash_hmac('sha256', $plaintext, $secret, binary: true), 0, SODIUM_CRYPTO_PWHASH_SALTBYTES);
-
         $hash = sodium_crypto_pwhash(
             length: 32,
             password: $plaintext,
