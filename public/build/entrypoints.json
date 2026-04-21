@@ -1,0 +1,27 @@
+{
+  "entrypoints": {
+    "main": {
+      "js": [
+        "/bundles/torqpimcorehelpers/build/static/js/773.0ce1c439.js",
+        "/bundles/torqpimcorehelpers/build/static/js/773.0ce1c439.js",
+        "/bundles/torqpimcorehelpers/build/static/js/109.482237ea.js",
+        "/bundles/torqpimcorehelpers/build/static/js/main.765174a6.js"
+      ],
+      "css": []
+    },
+    "pimcore_helpers_bundle": {
+      "js": [
+        "/bundles/torqpimcorehelpers/build/static/js/773.0ce1c439.js",
+        "/bundles/torqpimcorehelpers/build/static/js/async/__federation_expose_default_export.f452bfa4.js",
+        "/bundles/torqpimcorehelpers/build/static/js/remoteEntry.js"
+      ],
+      "css": []
+    },
+    "exposeRemote": {
+      "js": [
+        "/bundles/torqpimcorehelpers/build/exposeRemote.js"
+      ],
+      "css": []
+    }
+  }
+}

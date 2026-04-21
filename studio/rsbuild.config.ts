@@ -54,6 +54,7 @@ export default defineConfig({
     output: {
         manifest: true,
         assetPrefix: "/bundles/torqpimcorehelpers/build",
+        cleanDistPath: true,
         distPath: {
             root: buildPath,
         },
