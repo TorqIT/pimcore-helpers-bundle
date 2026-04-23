@@ -25,6 +25,10 @@ services:
         resource: '../src/Repository'
         public: true
 
+    Torq\PimcoreHelpersBundle\Webpack\:
+        resource: '../src/Webpack'
+        public: true
+
     pimcore.data_object.grid_column_config.operator.factory.classification_store_key_getter:
         class: Pimcore\Bundle\AdminBundle\DataObject\GridColumnConfig\Operator\Factory\DefaultOperatorFactory
         arguments:

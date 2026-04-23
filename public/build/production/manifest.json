@@ -1,0 +1,45 @@
+{
+  "allFiles": [
+    "/bundles/torqpimcorehelpers/build/production/static/js/main.fed8a25e.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/remoteEntry.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.97e484e0.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/109.bafd05c7.js",
+    "/bundles/torqpimcorehelpers/build/production/mf-stats.json",
+    "/bundles/torqpimcorehelpers/build/production/mf-manifest.json",
+    "/bundles/torqpimcorehelpers/build/production/main.html"
+  ],
+  "entries": {
+    "main": {
+      "html": [
+        "/bundles/torqpimcorehelpers/build/production/main.html"
+      ],
+      "initial": {
+        "js": [
+          "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/109.bafd05c7.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/main.fed8a25e.js"
+        ]
+      },
+      "async": {
+        "js": [
+          "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js"
+        ]
+      }
+    },
+    "pimcore_helpers_bundle": {
+      "initial": {
+        "js": [
+          "/bundles/torqpimcorehelpers/build/production/static/js/remoteEntry.js"
+        ]
+      },
+      "async": {
+        "js": [
+          "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.97e484e0.js"
+        ]
+      }
+    }
+  },
+  "integrity": {}
+}

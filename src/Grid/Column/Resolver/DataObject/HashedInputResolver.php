@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Torq\PimcoreHelpersBundle\Grid\Column\Resolver\DataObject;
 
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\ArrayField;
 use Exception;
 use Pimcore\Bundle\StudioBackendBundle\Exception\Api\InvalidArgumentException;
 use Pimcore\Bundle\StudioBackendBundle\Exception\Api\NotFoundException;
@@ -21,13 +19,14 @@ use Pimcore\Bundle\StudioBackendBundle\Util\Constant\ElementTypes;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\Element\ElementInterface;
 use Pimcore\Model\UserInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\ArrayField;
+use Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\HashedInput;
 
 /** @internal */
 #[AutoconfigureTag(name: 'pimcore.studio_backend.grid_column_resolver')]
-final class ArrayFieldResolver implements
-    ColumnResolverInterface,
-    CoreElementColumnResolverInterface,
-    ExportResolverInterface
+final class HashedInputResolver implements ColumnResolverInterface, CoreElementColumnResolverInterface,
+                                           ExportResolverInterface
 {
     use ColumnDataTrait;
     use LocalizedValueTrait;
@@ -46,8 +45,8 @@ final class ArrayFieldResolver implements
 
         $fieldDefinition = $this->getFieldDefinition($column->getKey(), $element->getClass());
 
-        if (!$fieldDefinition instanceof ArrayField) {
-            throw new InvalidArgumentException('Field definition must be an ArrayField instance');
+        if (!$fieldDefinition instanceof HashedInput) {
+            throw new InvalidArgumentException('Field definition must be a HashedInput instance');
         }
 
         $formattedValue = $fieldDefinition->getForCsvExport($element);
@@ -68,8 +67,8 @@ final class ArrayFieldResolver implements
 
         $fieldDefinition = $this->getFieldDefinition($column->getKey(), $element->getClass());
 
-        if (!$fieldDefinition instanceof ArrayField) {
-            throw new InvalidArgumentException('Field definition must be an ArrayField instance');
+        if (!$fieldDefinition instanceof HashedInput) {
+            throw new InvalidArgumentException('Field definition must be an HashedInput instance');
         }
 
         // Get raw array value for Studio UI
@@ -80,7 +79,7 @@ final class ArrayFieldResolver implements
 
     public function getType(): string
     {
-        return 'data-object.arrayField';
+        return 'data-object.hashedInput';
     }
 
     public function supportedElementTypes(): array

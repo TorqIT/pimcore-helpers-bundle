@@ -4,3 +4,4 @@ pimcore:
             data:
                 map:
                     arrayField: Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\ArrayField
+                    hashedInput: Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\HashedInput

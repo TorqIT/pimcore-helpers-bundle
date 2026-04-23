@@ -1,10 +1,5 @@
 services:
-    Torq\PimcoreHelpersBundle\Grid\Column\Definition\DataObject\ArrayFieldDefinition:
-        tags:
-            - { name: 'pimcore.studio_backend.grid_column_definition' }
-
-    Torq\PimcoreHelpersBundle\Grid\Column\Resolver\DataObject\ArrayFieldResolver:
-        tags:
-            - { name: 'pimcore.studio_backend.grid_column_resolver' }
-
-    Torq\PimcoreHelpersBundle\DataObject\Data\Adapter\ArrayFieldAdapter: ~
+    Torq\PimcoreHelpersBundle\Grid\Column\Definition\DataObject\ArrayFieldDefinition: ~
+    Torq\PimcoreHelpersBundle\Grid\Column\Definition\DataObject\HashedInputDefinition: ~
+    Torq\PimcoreHelpersBundle\Grid\Column\Resolver\DataObject\ArrayFieldResolver: ~
+    Torq\PimcoreHelpersBundle\Grid\Column\Resolver\DataObject\HashedInputResolver: ~

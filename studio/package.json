@@ -1,0 +1,64 @@
+{
+  "name": "pimcore-helpers-bundle",
+  "scripts": {
+    "dev-server": "NODE_ENV=development rsbuild dev",
+    "build": "NODE_ENV=production rsbuild build",
+    "lint": "eslint ./js",
+    "lint-fix": "eslint ./js --fix",
+    "lint-fix-watch": "nodemon --watch './js/**/*' --exec \"eslint ./js --fix --cache\" -e js,jsx,ts,tsx",
+    "check-types": "tsc --noEmit",
+    "check-types-watch": "tsc --noEmit --watch"
+  },
+  "license": "PEL",
+  "private": true,
+  "devDependencies": {
+    "@babel/preset-react": "^7.23.3",
+    "@module-federation/rsbuild-plugin": "^2.1.0",
+    "@rsbuild/core": "^1.3.16",
+    "@rsbuild/plugin-react": "^1.3.1",
+    "@rtk-query/codegen-openapi": "^1.2.0",
+    "@storybook/addon-a11y": "^8.0.5",
+    "@storybook/addon-essentials": "^8.0.5",
+    "@storybook/addon-interactions": "^8.0.5",
+    "@storybook/addon-links": "^8.0.5",
+    "@storybook/addon-onboarding": "^8.0.5",
+    "@storybook/addon-webpack5-compiler-swc": "^1.0.2",
+    "@storybook/blocks": "^8.0.5",
+    "@storybook/react": "^8.0.5",
+    "@storybook/react-webpack5": "^8.0.5",
+    "@storybook/test": "^8.0.5",
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^29.5.12",
+    "@types/react-dom": "18.3.x",
+    "@types/webpack-env": "^1.18.4",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^15.x",
+    "typescript-eslint": "^8.x",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "prettier": "^3.6.2",
+    "storybook": "^8.0.5",
+    "stream": "^0.0.2",
+    "ts-jest": "^29.1.2",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "whatwg-fetch": "^3.6.20"
+  },
+  "dependencies": {
+    "@pimcore/studio-ui-bundle": "^0.15.17",
+    "nodemon": "^3.1.14",
+    "react": "18.3.x",
+    "react-dom": "18.3.x"
+  },
+  "overrides": {
+    "koa": ">=2.16.4"
+  },
+  "prettier": {
+    "printWidth": 120
+  }
+}
