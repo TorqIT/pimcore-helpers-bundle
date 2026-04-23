@@ -1,5 +1,3 @@
-// @ts-nocheck directive
-
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { pluginModuleFederation } from "@module-federation/rsbuild-plugin";
@@ -10,33 +8,23 @@ import packages from "./package.json";
 
 const buildPath = path.resolve(__dirname, "..", "public", "build");
 
-if (fs.existsSync(path.resolve(__dirname, "..", "public", "build"))) {
-    fs.readdirSync(path.resolve(__dirname, "..", "public", "build")).forEach((file) => {
-        if (file !== "studio-npm-package.tgz") {
-            fs.rmSync(path.resolve(__dirname, "..", "public", "build", file), { recursive: true });
-        }
-    });
-}
-
+const devBuildPath = path.resolve(buildPath, "development");
 if (!fs.existsSync(buildPath)) {
     fs.mkdirSync(buildPath, { recursive: true });
 }
 
-let nodeEnv = process.env.NODE_ENV;
-let env: "development" | "production" = "production";
-
-const isDevServer = nodeEnv === "dev-server";
-if (nodeEnv !== env) {
-    env = "development";
+const prodBuildPath = path.resolve(buildPath, "production");
+if (!fs.existsSync(buildPath)) {
+    fs.mkdirSync(buildPath, { recursive: true });
 }
 
+const isDevServer = process.env.NODE_ENV === "development";
 export default defineConfig({
-    mode: env,
+    mode: process.env.NODE_ENV === "production" ? "production" : "development",
     server: {
         port: 3033,
     },
     dev: {
-        ...(!isDevServer ? { assetPrefix: "/bundles/torqpimcorehelpers/build/" } : {}),
         client: {
             host: "localhost",
             port: 3033,
@@ -53,11 +41,9 @@ export default defineConfig({
     },
     output: {
         manifest: true,
-        assetPrefix: "/bundles/torqpimcorehelpers/build",
+        assetPrefix: "/bundles/torqpimcorehelpers/build/" + (isDevServer ? "development" : "production"),
         cleanDistPath: true,
-        distPath: {
-            root: buildPath,
-        },
+        distPath: isDevServer ? devBuildPath : prodBuildPath,
     },
     tools: {
         bundlerChain: (chain, { env }) => {
@@ -128,12 +114,12 @@ export default defineConfig({
                 react: {
                     singleton: true,
                     eager: true,
-                    requiredVersion: false,
+                    requiredVersion: packages.dependencies.react,
                 },
                 "react-dom": {
                     singleton: true,
                     eager: true,
-                    requiredVersion: false,
+                    requiredVersion: packages.dependencies["react-dom"],
                 },
             },
         }),

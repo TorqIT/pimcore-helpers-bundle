@@ -34,3 +34,4 @@ node_modules
 /.htaccess
 /auth.json
 /config.json
+public/build/development

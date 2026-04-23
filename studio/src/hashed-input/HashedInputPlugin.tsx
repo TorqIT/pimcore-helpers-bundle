@@ -34,6 +34,5 @@ export const HashedInputPlugin: IAbstractPlugin = {
                 fieldDefinitionRegistry.registerDynamicType(container.get(HASHED_INPUT_DEFINITION_SERVICE_ID));
             },
         });
-        console.log("HashedInputPlugin starting...");
     },
 };
