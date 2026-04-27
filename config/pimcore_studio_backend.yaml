@@ -2,4 +2,6 @@ pimcore_studio_backend:
     data_object_data_adapter_mapping:
         Pimcore\Bundle\StudioBackendBundle\DataObject\Data\Adapter\StringAdapter:
             - "arrayField"
+        Torq\PimcoreHelpersBundle\DataObject\Data\Adapter\FreeSoloFieldAdapter:
+            - "freeSolo"
             - "hashedInput"
