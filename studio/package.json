@@ -37,7 +37,6 @@
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^15.x",
-    "typescript-eslint": "^8.x",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.6.2",
@@ -47,10 +46,13 @@
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^8.x",
     "whatwg-fetch": "^3.6.20"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.2.2",
     "@pimcore/studio-ui-bundle": "^0.15.17",
+    "antd": "^6.3.7",
     "nodemon": "^3.1.14",
     "react": "18.3.x",
     "react-dom": "18.3.x"

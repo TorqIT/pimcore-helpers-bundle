@@ -15,7 +15,13 @@ final class WebpackEntryPointProvider implements WebpackEntryPointProviderInterf
 {
     public function getEntryPointsJsonLocations(): array
     {
-        return glob(__DIR__ . '/../../public/build/*/entrypoints.json');
+        $productionEntrypoint = __DIR__ . '/../../public/build/production/entrypoints.json';
+        $developmentEntrypoint = __DIR__ . '/../../public/build/development/entrypoints.json';
+        if (file_exists($developmentEntrypoint)) {
+            return [$productionEntrypoint, $developmentEntrypoint];
+        } else {
+            return [$productionEntrypoint];
+        }
     }
 
     public function getEntryPoints(): array

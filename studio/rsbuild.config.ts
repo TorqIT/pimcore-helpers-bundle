@@ -24,6 +24,13 @@ export default defineConfig({
     server: {
         port: 3033,
     },
+    dev: {
+        client: {
+            host: "localhost",
+            port: 3033,
+            protocol: "ws",
+        },
+    },
     source: {
         entry: {
             main: "./src/main.ts",
@@ -49,6 +56,9 @@ export default defineConfig({
         pluginModuleFederation({
             name: "pimcore_helpers_bundle",
             filename: "static/js/remoteEntry.js",
+            exposes: {
+                ".": "./src/main.ts",
+            },
             dts: false,
             remotes: {
                 "@pimcore/studio-ui-bundle": `promise new Promise(resolve => {
@@ -82,6 +92,11 @@ export default defineConfig({
                     singleton: true,
                     eager: true,
                     requiredVersion: packages.dependencies["react-dom"],
+                },
+                antd: {
+                    singleton: true,
+                    eager: true,
+                    requiredVersion: packages.dependencies.antd,
                 },
             },
         }),
