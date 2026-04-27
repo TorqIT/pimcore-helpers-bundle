@@ -75,15 +75,4 @@ pimcore.object.tags.freeSolo = Class.create(pimcore.object.tags.select, {
 
         return this.component;
     },
-
-    getValue: function () {
-        if (this.isRendered()) {
-            const raw = this.component.getRawValue();
-            const selected = this.component.getValue();
-            return raw !== '' && raw !== selected ? raw : selected;
-        } else if (this.defaultValue) {
-            return this.defaultValue;
-        }
-        return this.data;
-    },
 });
