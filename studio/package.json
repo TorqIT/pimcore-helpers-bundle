@@ -1,5 +1,6 @@
 {
   "name": "pimcore-helpers-bundle",
+  "type": "module",
   "scripts": {
     "dev-server": "NODE_ENV=development rsbuild dev",
     "build": "NODE_ENV=production rsbuild build",
@@ -52,7 +53,7 @@
   "dependencies": {
     "@ant-design/icons": "^6.2.2",
     "@pimcore/studio-ui-bundle": "^0.15.17",
-    "antd": "^6.3.7",
+    "antd": "5.22.x",
     "nodemon": "^3.1.14",
     "react": "18.3.x",
     "react-dom": "18.3.x"
