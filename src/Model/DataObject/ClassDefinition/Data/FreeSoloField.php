@@ -20,12 +20,4 @@ class FreeSoloField extends Select
             throw new ValidationException('Empty mandatory field [ ' . $this->getName() . ' ]');
         }
     }
-
-    public static function __set_state(array $data): static
-    {
-        $obj = new static();
-        $obj->setValues($data);
-
-        return $obj;
-    }
 }
