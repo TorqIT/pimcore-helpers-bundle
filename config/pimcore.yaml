@@ -4,4 +4,5 @@ pimcore:
             data:
                 map:
                     arrayField: Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\ArrayField
+                    freeSolo: Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\FreeSoloField
                     hashedInput: Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\HashedInput
