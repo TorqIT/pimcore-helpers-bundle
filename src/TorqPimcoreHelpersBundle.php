@@ -5,21 +5,20 @@ declare(strict_types=1);
 namespace Torq\PimcoreHelpersBundle;
 
 use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
-use Pimcore\Extension\Bundle\PimcoreBundleAdminClassicInterface;
-use Pimcore\Extension\Bundle\Traits\BundleAdminClassicTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ArrayFieldTypeRegistrationPass;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\HashedInputTypeRegistrationPass;
 use Torq\PimcoreHelpersBundle\Service\Common\BundleAssetResolverTrait;
 
-class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreBundleAdminClassicInterface
+use function dirname;
+
+class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle
 {
-    use BundleAdminClassicTrait;
     use BundleAssetResolverTrait;
 
     public function getPath(): string
     {
-        return \dirname(__DIR__);
+        return dirname(__DIR__);
     }
 
     public function build(ContainerBuilder $container): void
