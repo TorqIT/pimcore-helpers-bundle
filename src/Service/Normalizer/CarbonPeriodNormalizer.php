@@ -25,12 +25,11 @@ class CarbonPeriodNormalizer implements NormalizerInterface
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool|ArrayObject|null {
-        $output = [];
-        foreach ($data as $datum) {
-            $output[] = $this->carbonNormalizer->normalize($datum, $format, $context);
-        }
-        return $output;
-    }
+        return [
+            'startDate' => $this->carbonNormalizer->normalize($data->getStartDate(), $format, $context),
+            'endDate' => $this->carbonNormalizer->normalize($data->getEndDate(), $format, $context),
+        ];
+    } 
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
