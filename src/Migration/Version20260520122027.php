@@ -20,11 +20,12 @@ final class Version20260520122027 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $procedure = <<<SQL
-            create procedure DELETE_DATA_OBJECTS (in className varchar(190))
+            create procedure DELETE_DATA_OBJECTS (in className varchar(190), in ids json default null)
             begin
-                declare exit handler for sqlexception 
+                declare exit handler for sqlexception
                 begin
                     rollback;
+                    drop temporary table if exists _delete_object_ids;
                 end;
 
                 start transaction;
@@ -33,27 +34,39 @@ final class Version20260520122027 extends AbstractMigration
                         signal sqlstate '45000' set message_text = concat('No entry in classes table with className: ', className);
                     end if;
 
+                    create temporary table _delete_object_ids (id int not null, primary key (id));
+
+                    if ids is null then
+                        insert into _delete_object_ids (id) select id from objects where objects.className = className;
+                    else
+                        insert into _delete_object_ids (id)
+                            select jt.value from json_table(ids, '$[*]' columns (value int path '$')) jt
+                            join objects o on o.id = jt.value and o.className = className;
+                    end if;
+
                     # dependencies
-                    delete t1 from dependencies t1 join objects o on t1.sourceid = o.id and t1.sourcetype = 'object' where o.className = className;
-                    delete t1 from dependencies t1 join objects o on t1.targetid = o.id and t1.targettype = 'object' where o.className = className;
+                    delete t1 from dependencies t1 join _delete_object_ids t on t1.sourceid = t.id and t1.sourcetype = 'object';
+                    delete t1 from dependencies t1 join _delete_object_ids t on t1.targetid = t.id and t1.targettype = 'object';
 
                     # properties
-                    delete t1 from properties t1 join objects o on t1.cid = o.id and t1.ctype = 'object' where o.className = className;
+                    delete t1 from properties t1 join _delete_object_ids t on t1.cid = t.id and t1.ctype = 'object';
 
                     # schedule_tasks
-                    delete t1 from schedule_tasks t1 join objects o on t1.cid = o.id and t1.ctype = 'object' where o.className = className;
+                    delete t1 from schedule_tasks t1 join _delete_object_ids t on t1.cid = t.id and t1.ctype = 'object';
 
                     # notes
-                    delete t1 from notes t1 join objects o on t1.cid = o.id and t1.ctype = 'object' where o.className = className;
+                    delete t1 from notes t1 join _delete_object_ids t on t1.cid = t.id and t1.ctype = 'object';
 
                     # versions
-                    delete t1 from versions t1 join objects o on t1.cid = o.id and t1.ctype = 'object' where o.className = className;
+                    delete t1 from versions t1 join _delete_object_ids t on t1.cid = t.id and t1.ctype = 'object';
 
                     # tags_assignment
-                    delete t1 from tags_assignment t1 join objects o on t1.cid = o.id and t1.ctype = 'object' where o.className = className;
+                    delete t1 from tags_assignment t1 join _delete_object_ids t on t1.cid = t.id and t1.ctype = 'object';
 
                     # objects
-                    delete from objects where objects.className = className;
+                    delete o from objects o join _delete_object_ids t on o.id = t.id;
+
+                    drop temporary table _delete_object_ids;
                 commit;
             end;
         SQL;
