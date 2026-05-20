@@ -20,7 +20,7 @@ final class Version20260520122027 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $procedure = <<<SQL
-            create procedure DELETE_DATA_OBJECTS (in className varchar(190), in ids json default null)
+            create procedure DELETE_DATA_OBJECTS (in className varchar(190), in ids json)
             begin
                 declare exit handler for sqlexception
                 begin
@@ -31,7 +31,7 @@ final class Version20260520122027 extends AbstractMigration
                 start transaction;
                     # ensure class exists
                     if (select count(*) != 1 from classes where name = className) then
-                        signal sqlstate '45000' set message_text = concat('No entry in classes table with className: ', className);
+                        signal sqlstate '45000' set message_text = 'No entry in classes table for parameter className';
                     end if;
 
                     create temporary table _delete_object_ids (id int not null, primary key (id));
