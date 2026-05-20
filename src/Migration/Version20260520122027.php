@@ -26,22 +26,23 @@ final class Version20260520122027 extends AbstractMigration
                 begin
                     rollback;
                     drop temporary table if exists _delete_object_ids;
+                    resignal;
                 end;
 
                 start transaction;
                     # ensure class exists
-                    if (select count(*) != 1 from classes where name = className) then
+                    if (select count(*) != 1 from classes where name = className collate utf8mb4_general_ci) then
                         signal sqlstate '45000' set message_text = 'No entry in classes table for parameter className';
                     end if;
 
                     create temporary table _delete_object_ids (id int not null, primary key (id));
 
                     if ids is null then
-                        insert into _delete_object_ids (id) select id from objects where objects.className = className;
+                        insert into _delete_object_ids (id) select id from objects where objects.className = className collate utf8mb4_general_ci;
                     else
                         insert into _delete_object_ids (id)
                             select jt.value from json_table(ids, '$[*]' columns (value int path '$')) jt
-                            join objects o on o.id = jt.value and o.className = className;
+                            join objects o on o.id = jt.value and o.className = className collate utf8mb4_general_ci;
                     end if;
 
                     # dependencies
