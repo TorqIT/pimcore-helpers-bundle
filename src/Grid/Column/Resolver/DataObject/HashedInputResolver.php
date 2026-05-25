@@ -37,7 +37,7 @@ final class HashedInputResolver implements ColumnResolverInterface, CoreElementC
      * @throws InvalidArgumentException
      * @throws NotFoundException
      */
-    public function resolveForExport(Column $column, ElementInterface $element, UserInterface $user): ColumnData
+    public function resolveForExport(Column $column, ElementInterface $element): ColumnData
     {
         if (!$element instanceof Concrete) {
             throw new InvalidArgumentException('Element must be a concrete object');
