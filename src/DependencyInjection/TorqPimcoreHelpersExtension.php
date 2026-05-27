@@ -25,6 +25,10 @@ class TorqPimcoreHelpersExtension extends Extension implements PrependExtensionI
         if (isset($bundles['PimcoreStudioBackendBundle'])) {
             $loader->load('studio_backend_services.yaml');
         }
+        
+        if (isset($bundles['PimcoreStudioUiBundle'])) {
+            $loader->load('studio_ui_services.yaml');
+        }
     }
 
     public function prepend(ContainerBuilder $container): void
