@@ -30,8 +30,7 @@ class ObjectMetadataNormalizer implements NormalizerInterface
         foreach ($data->getData() as $column => $value) {
             $output->$column = $value;
         }
-        
-        return !empty((array)$output) ? $this->normalizer->normalize($output, $format, $context) : null;
+        return $this->normalizer->normalize($output, $format, $context);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
