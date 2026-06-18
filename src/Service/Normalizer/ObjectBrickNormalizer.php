@@ -38,7 +38,8 @@ class ObjectBrickNormalizer implements NormalizerInterface
             $brickName = $brick->getType();
             $output->$brickName = $brick;
         }
-        return $this->normalizer->normalize($output, $format, $context);
+        
+        return !empty((array)$output) ? $this->normalizer->normalize($output, $format, $context) : null;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

@@ -1,10 +1,13 @@
 {
   "allFiles": [
-    "/bundles/torqpimcorehelpers/build/production/static/js/main.fed8a25e.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/main.06506932.js",
     "/bundles/torqpimcorehelpers/build/production/static/js/remoteEntry.js",
-    "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.97e484e0.js",
-    "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js",
-    "/bundles/torqpimcorehelpers/build/production/static/js/109.bafd05c7.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/async/73.f7c43aa4.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/async/356.0136b9fa.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.505a1fa2.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/async/676.058393b5.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/103.8e6fc2d1.js",
+    "/bundles/torqpimcorehelpers/build/production/static/js/114.9636da9e.js",
     "/bundles/torqpimcorehelpers/build/production/mf-stats.json",
     "/bundles/torqpimcorehelpers/build/production/mf-manifest.json",
     "/bundles/torqpimcorehelpers/build/production/main.html"
@@ -16,14 +19,17 @@
       ],
       "initial": {
         "js": [
-          "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js",
-          "/bundles/torqpimcorehelpers/build/production/static/js/109.bafd05c7.js",
-          "/bundles/torqpimcorehelpers/build/production/static/js/main.fed8a25e.js"
+          "/bundles/torqpimcorehelpers/build/production/static/js/103.8e6fc2d1.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/114.9636da9e.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/main.06506932.js"
         ]
       },
       "async": {
         "js": [
-          "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js"
+          "/bundles/torqpimcorehelpers/build/production/static/js/103.8e6fc2d1.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/676.058393b5.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/356.0136b9fa.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/73.f7c43aa4.js"
         ]
       }
     },
@@ -35,8 +41,11 @@
       },
       "async": {
         "js": [
-          "/bundles/torqpimcorehelpers/build/production/static/js/773.40dc0552.js",
-          "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.97e484e0.js"
+          "/bundles/torqpimcorehelpers/build/production/static/js/103.8e6fc2d1.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/676.058393b5.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.505a1fa2.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/356.0136b9fa.js",
+          "/bundles/torqpimcorehelpers/build/production/static/js/async/73.f7c43aa4.js"
         ]
       }
     }

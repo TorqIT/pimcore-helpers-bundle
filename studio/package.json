@@ -1,5 +1,6 @@
 {
   "name": "pimcore-helpers-bundle",
+  "type": "module",
   "scripts": {
     "dev-server": "NODE_ENV=development rsbuild dev",
     "build": "NODE_ENV=production rsbuild build",

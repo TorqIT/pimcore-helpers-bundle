@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Torq\PimcoreHelpersBundle\Webpack\:
+        resource: '../src/Webpack'
+        public: true
