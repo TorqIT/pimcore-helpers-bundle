@@ -7,6 +7,7 @@ namespace Torq\PimcoreHelpersBundle;
 use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ArrayFieldTypeRegistrationPass;
+use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ClassificationstoreKeyGetterRegistrationPass;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\HashedInputTypeRegistrationPass;
 use Torq\PimcoreHelpersBundle\Service\Common\BundleAssetResolverTrait;
 
@@ -26,6 +27,7 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle
         parent::build($container);
         $container->addCompilerPass(new ArrayFieldTypeRegistrationPass());
         $container->addCompilerPass(new HashedInputTypeRegistrationPass());
+        $container->addCompilerPass(new ClassificationstoreKeyGetterRegistrationPass());
     }
 
     public function getCssPaths(): array
