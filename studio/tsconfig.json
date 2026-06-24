@@ -1,25 +1,15 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "es2017",
+    "module": "esnext",
+    "target": "esnext",
     "moduleResolution": "bundler",
-    "types": ["@types/webpack-env" ],
+    "types": ["react", "react-dom"],
     "baseUrl": "./js/",
     "strictNullChecks": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "skipLibCheck": true,
-    "paths": {
-      "*": ["./@mf-types/*"]
-    }
+    "skipLibCheck": true
   },
-  
-  "include": [
-    "./js/**/*",
-    "./@mf-types/*"
-  ]
+  "include": ["./js/**/*"]
 }

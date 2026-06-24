@@ -1,5 +1,5 @@
 import { AbstractGridCellDefinition, DynamicTypeGridCellAbstract } from "@pimcore/studio-ui-bundle/modules/element";
-import React, { type ReactElement } from "react";
+import { type ReactElement } from "react";
 
 /**
  * Grid Cell for Array Field - displays all values comma-delimited

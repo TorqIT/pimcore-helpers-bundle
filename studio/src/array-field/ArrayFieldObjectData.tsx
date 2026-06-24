@@ -1,4 +1,4 @@
-import React, { type ReactElement } from "react";
+import { type ReactElement } from "react";
 import { Button, Input, InputNumber, Space } from "antd";
 import { DownOutlined, MinusCircleOutlined, PlusOutlined, UpOutlined } from "@ant-design/icons";
 import {
