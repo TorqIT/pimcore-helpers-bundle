@@ -76,11 +76,6 @@ export default defineConfig({
                     eager: true,
                     requiredVersion: false,
                 },
-                antd: {
-                    singleton: true,
-                    eager: true,
-                    requiredVersion: false,
-                },
             },
         }),
     ],

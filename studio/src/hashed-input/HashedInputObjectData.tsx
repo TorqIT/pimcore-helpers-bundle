@@ -1,5 +1,4 @@
 import { injectable } from "inversify";
-import type React from "react";
 import { container } from "@pimcore/studio-ui-bundle";
 import { serviceIds } from "@pimcore/studio-ui-bundle/app";
 import { DynamicTypeObjectDataAbstractInput } from "@pimcore/studio-ui-bundle/modules/element";

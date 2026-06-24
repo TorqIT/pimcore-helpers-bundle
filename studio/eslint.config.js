@@ -43,7 +43,6 @@ export default tseslint.config(
             "react/jsx-indent": ["error", 2],
             "react/jsx-key": "error",
             "react/jsx-max-props-per-line": ["error", { maximum: 1 }],
-            "react/jsx-no-literals": "off",
             "react/jsx-no-target-blank": "error",
             "react/jsx-pascal-case": "error",
             "react/jsx-sort-props": "error",
@@ -61,14 +60,6 @@ export default tseslint.config(
                     prop: "ignore",
                 },
             ],
-        },
-    },
-    {
-        files: ["**/*.spec.{ts,tsx}", "**/*.test.{ts,tsx}"],
-        languageOptions: {
-            globals: {
-                ...globals.jest,
-            },
         },
     },
 );

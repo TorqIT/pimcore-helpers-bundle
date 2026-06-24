@@ -20,7 +20,7 @@
       "api": ""
     },
     "globalName": "pimcore_helpers_bundle",
-    "pluginVersion": "2.4.0",
+    "pluginVersion": "2.6.0",
     "publicPath": "/bundles/torqpimcorehelpers/build/production/"
   },
   "shared": [
@@ -37,7 +37,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/async/93.981edf05.js"
+            "static/js/async/93.eb859bfb.js"
           ]
         },
         "css": {
@@ -53,18 +53,18 @@
     },
     {
       "singleton": true,
-      "requiredVersion": "^5.29.3",
+      "requiredVersion": "^5.22.x",
       "shareScope": "default",
-      "eager": true,
+      "import": "antd",
       "name": "antd",
       "version": "5.29.3",
+      "eager": false,
       "id": "pimcore_helpers_bundle:antd",
       "assets": {
         "js": {
           "async": [],
           "sync": [
-            "static/js/remoteEntry.js",
-            "static/js/952.543dc0cc.js"
+            "static/js/async/363.76dc79e7.js"
           ]
         },
         "css": {
@@ -90,8 +90,8 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/remoteEntry.js",
-            "static/js/952.543dc0cc.js"
+            "static/js/109.84bcd3f5.js",
+            "static/js/remoteEntry.js"
           ]
         },
         "css": {
@@ -115,8 +115,8 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/remoteEntry.js",
-            "static/js/952.543dc0cc.js"
+            "static/js/109.84bcd3f5.js",
+            "static/js/remoteEntry.js"
           ]
         },
         "css": {
@@ -124,9 +124,7 @@
           "sync": []
         }
       },
-      "usedIn": [
-        "."
-      ],
+      "usedIn": [],
       "usedExports": [],
       "fallback": ""
     }
@@ -179,7 +177,6 @@
       "id": "pimcore_helpers_bundle:.",
       "name": ".",
       "requires": [
-        "react",
         "antd",
         "@ant-design/icons"
       ],
@@ -187,10 +184,12 @@
       "assets": {
         "js": {
           "sync": [
-            "static/js/103.bf7f8626.js",
-            "static/js/async/__federation_expose_default_export.341f9bd5.js"
+            "static/js/103.541711c3.js",
+            "static/js/async/__federation_expose_default_export.8741446e.js"
           ],
-          "async": []
+          "async": [
+            "static/js/async/8.ca1260be.js"
+          ]
         },
         "css": {
           "sync": [],

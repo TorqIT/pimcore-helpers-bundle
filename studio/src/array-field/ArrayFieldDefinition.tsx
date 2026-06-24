@@ -1,5 +1,4 @@
 import { injectable } from "inversify";
-import React from "react";
 import { DynamicTypeFieldDefinitionDataAbstract } from "@pimcore/studio-ui-bundle/modules/field-definitions";
 import { type ElementIcon } from "@pimcore/studio-ui-bundle/modules/widget-manager";
 
