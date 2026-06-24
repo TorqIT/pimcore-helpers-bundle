@@ -2,19 +2,23 @@
   "entrypoints": {
     "main": {
       "js": [
-        "/bundles/torqpimcorehelpers/build/production/static/js/103.bf7f8626.js",
-        "/bundles/torqpimcorehelpers/build/production/static/js/async/93.981edf05.js",
-        "/bundles/torqpimcorehelpers/build/production/static/js/103.bf7f8626.js",
-        "/bundles/torqpimcorehelpers/build/production/static/js/952.543dc0cc.js",
-        "/bundles/torqpimcorehelpers/build/production/static/js/main.4f71124f.js"
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/363.76dc79e7.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/8.ca1260be.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/103.541711c3.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/93.eb859bfb.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/103.541711c3.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/109.84bcd3f5.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/main.90a47543.js"
       ],
       "css": []
     },
     "pimcore_helpers_bundle": {
       "js": [
-        "/bundles/torqpimcorehelpers/build/production/static/js/103.bf7f8626.js",
-        "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.341f9bd5.js",
-        "/bundles/torqpimcorehelpers/build/production/static/js/async/93.981edf05.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/363.76dc79e7.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/8.ca1260be.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/103.541711c3.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.8741446e.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/93.eb859bfb.js",
         "/bundles/torqpimcorehelpers/build/production/static/js/remoteEntry.js"
       ],
       "css": []
