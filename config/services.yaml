@@ -28,3 +28,8 @@ services:
     Torq\PimcoreHelpersBundle\Webpack\:
         resource: '../src/Webpack'
         public: true
+
+    Torq\PimcoreHelpersBundle\Controller\:
+        resource: '../src/Controller'
+        public: true
+        tags: ['controller.service_arguments']

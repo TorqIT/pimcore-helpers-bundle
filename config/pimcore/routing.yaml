@@ -1,0 +1,5 @@
+torq_pimcore_helpers_copilot_file_upload:
+    resource: "@TorqPimcoreHelpersBundle/src/Controller/CopilotFileUploadController.php"
+    type: attribute
+    options:
+        expose: true
