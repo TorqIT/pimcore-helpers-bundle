@@ -19,6 +19,8 @@ services:
 
     Torq\PimcoreHelpersBundle\Service\:
         resource: '../src/Service'
+        # value objects, not services
+        exclude: '../src/Service/DataGeneration/RuleDefinition.php'
         public: true
 
     Torq\PimcoreHelpersBundle\Repository\:
@@ -28,3 +30,14 @@ services:
     Torq\PimcoreHelpersBundle\Webpack\:
         resource: '../src/Webpack'
         public: true
+
+    # Config-driven field-generation engine + generic pre-save listener.
+    # The listener's event tags/priority are added by TorqPimcoreHelpersExtension from config.
+    Torq\PimcoreHelpersBundle\Service\DataGeneration\DataGenerationEngine:
+        arguments:
+            $expressionLanguage: '@pimcore.calculated_value.expression_language'
+            $managed: '%torq_pimcore_helpers.data_generation.managed%'
+
+    Torq\PimcoreHelpersBundle\EventListener\DataGenerationListener:
+        arguments:
+            $engine: '@Torq\PimcoreHelpersBundle\Service\DataGeneration\DataGenerationEngine'
