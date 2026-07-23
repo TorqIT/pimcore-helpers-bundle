@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Torq\PimcoreHelpersBundle;
 
 use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
+use Pimcore\Extension\Bundle\Installer\InstallerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ArrayFieldTypeRegistrationPass;
 use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\FreeSoloFieldTypeRegistrationPass;
@@ -21,6 +22,11 @@ class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle
     public function getPath(): string
     {
         return dirname(__DIR__);
+    }
+
+    public function getInstaller(): ?InstallerInterface
+    {
+        return new Installer();
     }
 
     public function build(ContainerBuilder $container): void
