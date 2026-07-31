@@ -79,6 +79,34 @@ class FieldFetcher
         }
     }
 
+    public function getFieldColumnName(DataObject|FCData|BrickData|string $object, string $field)
+    {
+        $def = $this->getFieldDefinition($object, $field);
+        if ($def instanceof FieldDef\ResourcePersistenceAwareInterface) {
+            if (is_array($type = $def->getColumnType())) {
+                $suffixes = array_keys($type);
+                return array_map(fn($s) => $def->getName() . "__$s", $suffixes);
+            } else {
+                return $def->getName();
+            }
+        }
+        return null;
+    }
+
+    public function getFieldQueryColumnName(DataObject|FCData|BrickData|string $object, string $field)
+    {
+        $def = $this->getFieldDefinition($object, $field);
+        if ($def instanceof FieldDef\QueryResourcePersistenceAwareInterface) {
+            if (is_array($type = $def->getQueryColumnType())) {
+                $suffixes = array_keys($type);
+                return array_map(fn($s) => $def->getName() . "__$s", $suffixes);
+            } else {
+                return $def->getName();
+            }
+        }
+        return null;
+    }
+
     public function getFieldDefinitionType(DataObject|FCData|BrickData|string $object, string $field)
     {
         return $this->getFieldDefinition($object, $field)?->getFieldType();
