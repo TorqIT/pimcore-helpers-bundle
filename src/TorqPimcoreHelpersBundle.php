@@ -2,45 +2,61 @@
 
 declare(strict_types=1);
 
-namespace Torq\PimcoreHelpersBundle;
-
-use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ArrayFieldTypeRegistrationPass;
-use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\FreeSoloFieldTypeRegistrationPass;
-use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ClassificationstoreKeyGetterRegistrationPass;
-use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\HashedInputTypeRegistrationPass;
-use Torq\PimcoreHelpersBundle\Service\Common\BundleAssetResolverTrait;
-
-use function dirname;
-
-class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle
-{
-    use BundleAssetResolverTrait;
-
-    public function getPath(): string
-    {
-        return dirname(__DIR__);
+namespace Pimcore\Extension\Bundle {
+    if (!interface_exists(PimcoreBundleAdminClassicInterface::class)) {
+        interface PimcoreBundleAdminClassicInterface {}
     }
+}
 
-    public function build(ContainerBuilder $container): void
-    {
-        parent::build($container);
-        $container->addCompilerPass(new ArrayFieldTypeRegistrationPass());
-        $container->addCompilerPass(new FreeSoloFieldTypeRegistrationPass());
-        $container->addCompilerPass(new HashedInputTypeRegistrationPass());
-        $container->addCompilerPass(new ClassificationstoreKeyGetterRegistrationPass());
-    }
+namespace Torq\PimcoreHelpersBundle {
 
-    public function getCssPaths(): array
+    use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
+    use Pimcore\Extension\Bundle\PimcoreBundleAdminClassicInterface;
+    use Symfony\Component\DependencyInjection\ContainerBuilder;
+    use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ArrayFieldTypeRegistrationPass;
+    use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\ClassificationstoreKeyGetterRegistrationPass;
+    use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\FreeSoloFieldTypeRegistrationPass;
+    use Torq\PimcoreHelpersBundle\DependencyInjection\Compiler\HashedInputTypeRegistrationPass;
+    use Torq\PimcoreHelpersBundle\Service\Common\BundleAssetResolverTrait;
+    use function dirname;
+    
+    class TorqPimcoreHelpersBundle extends AbstractPimcoreBundle implements PimcoreBundleAdminClassicInterface
     {
-        $paths = $this->getBundleAssetPaths($this->getPath() . '/public/css', 'css');
-        return array_map(fn($p) => "/bundles/torqpimcorehelpers/$p", $paths);
-    }
+        use BundleAssetResolverTrait;
+        public function getPath(): string
+        {
+            return dirname(__DIR__);
+        }
 
-    public function getJsPaths(): array
-    {
-        $paths = $this->getBundleAssetPaths($this->getPath() . '/public/js', 'js');
-        return array_map(fn($p) => "/bundles/torqpimcorehelpers/$p", $paths);
+        public function build(ContainerBuilder $container): void
+        {
+            parent::build($container);
+            $container->addCompilerPass(new ArrayFieldTypeRegistrationPass());
+            $container->addCompilerPass(new FreeSoloFieldTypeRegistrationPass());
+            $container->addCompilerPass(new HashedInputTypeRegistrationPass());
+            $container->addCompilerPass(new ClassificationstoreKeyGetterRegistrationPass());
+        }
+
+        public function getCssPaths(): array
+        {
+            $paths = $this->getBundleAssetPaths($this->getPath() . '/public/css', 'css');
+            return array_map(fn($p) => "/bundles/torqpimcorehelpers/$p", $paths);
+        }
+
+        public function getJsPaths(): array
+        {
+            $paths = $this->getBundleAssetPaths($this->getPath() . '/public/js', 'js');
+            return array_map(fn($p) => "/bundles/torqpimcorehelpers/$p", $paths);
+        }
+
+        public function getEditmodeJsPaths(): array
+        {
+            return [];
+        }
+
+        public function getEditmodeCssPaths(): array
+        {
+            return [];
+        }
     }
 }
