@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.2.2",
-    "@pimcore/studio-ui-bundle": "^2026.1.2",
+    "@pimcore/studio-ui-bundle": "^2026.2",
     "antd": "^5.22.x",
     "react": "18.3.x",
     "react-dom": "18.3.x"
