@@ -10,7 +10,7 @@ export class HashedInputObjectData extends DynamicTypeObjectDataAbstractInput {
     readonly dynamicTypeFieldFilterType: any = container.get(serviceIds["DynamicTypes/FieldFilter/String"]);
 
     getObjectDataComponent(props: any): React.ReactElement {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+         
         return super.getObjectDataComponent(props);
     }
 

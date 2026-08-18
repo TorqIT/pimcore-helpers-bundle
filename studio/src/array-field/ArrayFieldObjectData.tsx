@@ -12,7 +12,7 @@ export class ArrayFieldObjectData extends DynamicTypeObjectDataAbstract {
     isAllowedInBatchEdit: boolean = false;
 
     getObjectDataComponent(props: ArrayFieldProps): ReactElement<ArrayFieldProps> {
-        return <ArrayField {...props} />;
+        return <ArrayField { ...props } />;
     }
 }
 
@@ -62,54 +62,73 @@ const ArrayField = (props: ArrayFieldProps): React.ReactElement => {
 
         switch (elementType) {
             case "textarea":
-                return <Input.TextArea {...commonProps} rows={3} />;
+                return (
+                  <Input.TextArea
+                    { ...commonProps }
+                    rows={ 3 }
+                  />
+);
             case "numeric":
-                return <InputNumber {...commonProps} style={{ width: "100%" }} />;
+                return (
+                  <InputNumber
+                    { ...commonProps }
+                    style={ { width: "100%" } }
+                  />
+);
             default:
-                return <Input {...commonProps} />;
+                return <Input { ...commonProps } />;
         }
     };
 
     return (
-        <div style={{ width: "100%" }}>
-            {values.length === 0 && !disabled ? (
-                <Button type="dashed" onClick={() => handleAddAt(0)} block icon={<PlusOutlined />}>
-                    Add Item
-                </Button>
+      <div style={ { width: "100%" } }>
+        {values.length === 0 && !disabled ? (
+          <Button
+            block
+            icon={ <PlusOutlined /> }
+            onClick={ () => handleAddAt(0) }
+            type="dashed"
+          >
+            Add Item
+          </Button>
             ) : (
                 values.map((value, index) => (
-                    <Space key={index} style={{ display: "flex", marginBottom: 8, width: "100%" }} align="baseline">
-                        <div style={{ flex: 1 }}>{renderElementField(props.elementType, value, index)}</div>
+                  <Space
+                    align="baseline"
+                    key={ index }
+                    style={ { display: "flex", marginBottom: 8, width: "100%" } }
+                  >
+                    <div style={ { flex: 1 } }>{renderElementField(props.elementType, value, index)}</div>
 
-                        {!disabled && (
-                            <>
-                                <Button
-                                    type="text"
-                                    icon={<UpOutlined />}
-                                    onClick={() => handleAddAt(index)}
-                                    title="Add above"
-                                />
+                    {!disabled && (
+                    <>
+                      <Button
+                        icon={ <UpOutlined /> }
+                        onClick={ () => handleAddAt(index) }
+                        title="Add above"
+                        type="text"
+                      />
 
-                                <Button
-                                    type="text"
-                                    icon={<DownOutlined />}
-                                    onClick={() => handleAddAt(index + 1)}
-                                    title="Add below"
-                                />
-                            </>
+                      <Button
+                        icon={ <DownOutlined /> }
+                        onClick={ () => handleAddAt(index + 1) }
+                        title="Add below"
+                        type="text"
+                      />
+                    </>
                         )}
 
-                        <Button
-                            type="text"
-                            danger
-                            icon={<MinusCircleOutlined />}
-                            onClick={() => handleRemove(index)}
-                            title="Remove"
-                            disabled={disabled}
-                        />
-                    </Space>
+                    <Button
+                      danger
+                      disabled={ disabled }
+                      icon={ <MinusCircleOutlined /> }
+                      onClick={ () => handleRemove(index) }
+                      title="Remove"
+                      type="text"
+                    />
+                  </Space>
                 ))
             )}
-        </div>
+      </div>
     );
 };

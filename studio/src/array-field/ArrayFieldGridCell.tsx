@@ -16,17 +16,17 @@ export class ArrayFieldGridCell extends DynamicTypeGridCellAbstract {
                 : "";
 
         return (
-            <div
-                className="default-cell__content"
-                style={{
+          <div
+            className="default-cell__content"
+            style={ {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
-                }}
-                title={displayValue}
-            >
-                {displayValue}
-            </div>
+                } }
+            title={ displayValue }
+          >
+            {displayValue}
+          </div>
         );
     }
 
