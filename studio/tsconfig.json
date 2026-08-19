@@ -4,12 +4,12 @@
     "target": "esnext",
     "moduleResolution": "bundler",
     "types": ["react", "react-dom"],
-    "baseUrl": "./js/",
+    "baseUrl": "./src/",
     "strictNullChecks": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["./js/**/*"]
+  "include": ["./src/**/*"]
 }

@@ -20,7 +20,7 @@
       "api": ""
     },
     "globalName": "pimcore_helpers_bundle",
-    "pluginVersion": "2.6.0",
+    "pluginVersion": "2.8.2",
     "publicPath": "/bundles/torqpimcorehelpers/build/production/"
   },
   "shared": [
@@ -34,7 +34,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/async/93.eb859bfb.js"
+            "static/js/async/93.00d4d6fd.js"
           ]
         },
         "css": {
@@ -54,7 +54,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/async/363.76dc79e7.js"
+            "static/js/async/363.a034d7d3.js"
           ]
         },
         "css": {
@@ -74,7 +74,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/109.84bcd3f5.js",
+            "static/js/109.0e64f7ff.js",
             "static/js/remoteEntry.js"
           ]
         },
@@ -95,7 +95,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/109.84bcd3f5.js",
+            "static/js/109.0e64f7ff.js",
             "static/js/remoteEntry.js"
           ]
         },
@@ -140,8 +140,8 @@
       "assets": {
         "js": {
           "sync": [
-            "static/js/103.541711c3.js",
-            "static/js/async/__federation_expose_default_export.8741446e.js"
+            "static/js/103.af2a6212.js",
+            "static/js/async/__federation_expose_default_export.f096ca22.js"
           ],
           "async": [
             "static/js/async/8.ca1260be.js"
