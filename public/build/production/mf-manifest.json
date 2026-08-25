@@ -20,21 +20,21 @@
       "api": ""
     },
     "globalName": "pimcore_helpers_bundle",
-    "pluginVersion": "2.8.2",
+    "pluginVersion": "2.9.0",
     "publicPath": "/bundles/torqpimcorehelpers/build/production/"
   },
   "shared": [
     {
       "id": "pimcore_helpers_bundle:@ant-design/icons",
       "name": "@ant-design/icons",
-      "version": "6.2.3",
+      "version": "6.3.2",
       "singleton": true,
       "requiredVersion": "^6.2.2",
       "assets": {
         "js": {
           "async": [],
           "sync": [
-            "static/js/async/93.00d4d6fd.js"
+            "static/js/async/323.1f253a3d.js"
           ]
         },
         "css": {
@@ -54,7 +54,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/async/363.a034d7d3.js"
+            "static/js/async/740.6ec69788.js"
           ]
         },
         "css": {
@@ -74,7 +74,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/109.0e64f7ff.js",
+            "static/js/109.327cb6d5.js",
             "static/js/remoteEntry.js"
           ]
         },
@@ -95,7 +95,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/109.0e64f7ff.js",
+            "static/js/109.327cb6d5.js",
             "static/js/remoteEntry.js"
           ]
         },
@@ -140,12 +140,10 @@
       "assets": {
         "js": {
           "sync": [
-            "static/js/103.af2a6212.js",
-            "static/js/async/__federation_expose_default_export.f096ca22.js"
+            "static/js/103.3e1163d4.js",
+            "static/js/async/__federation_expose_default_export.6bb07623.js"
           ],
-          "async": [
-            "static/js/async/8.ca1260be.js"
-          ]
+          "async": []
         },
         "css": {
           "sync": [],
