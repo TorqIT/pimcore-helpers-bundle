@@ -1,4 +1,8 @@
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
     Torq\PimcoreHelpersBundle\Service\Adapter\ArrayFieldAdapter:
         tags:
             - { name: 'pimcore.studio_backend.data_adapter' }
