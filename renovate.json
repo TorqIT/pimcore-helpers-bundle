@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "schedule": ["every day"],
+  "schedule": ["before 5am"],
   "updateNotScheduled": false,
   "enabledManagers": ["npm", "github-actions"],
   "packageRules": [
