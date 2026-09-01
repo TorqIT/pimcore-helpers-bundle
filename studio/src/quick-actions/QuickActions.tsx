@@ -6,9 +6,7 @@ import { isAllowed } from "@pimcore/studio-ui-bundle/modules/auth";
 
 const PERMISSION = "generic_data_index_tool";
 
-interface QuickActionsProps {}
-
-export function QuickActions({}: QuickActionsProps) {
+export function QuickActions() {
     const { token } = theme.useToken();
     const [isOpen, setIsOpen] = useState(false);
 
