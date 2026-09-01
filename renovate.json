@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "reviewers": ["lukemacausland"],
   "enabledManagers": ["npm", "github-actions"],
   "packageRules": [
     {
@@ -15,6 +16,10 @@
     {
       "matchManagers": ["npm"],
       "groupName": "Studio npm dependencies"
+    },
+    {
+      "matchDepTypes": ["overrides"],
+      "enabled": false
     }
   ]
 }
