@@ -15,6 +15,10 @@
     {
       "matchManagers": ["npm"],
       "groupName": "Studio npm dependencies"
+    },
+    {
+      "matchDepTypes": ["overrides"],
+      "enabled": false
     }
   ]
 }
