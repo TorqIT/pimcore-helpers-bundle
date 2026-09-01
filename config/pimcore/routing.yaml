@@ -1,0 +1,3 @@
+pimcore_helpers:
+  resource: routes.php
+  type: php
