@@ -17,6 +17,11 @@ services:
       resource: '../src/Command'
       public: true
 
+    Torq\PimcoreHelpersBundle\Controller\:
+      resource: '../src/Controller'
+      public: true
+      tags: [ 'controller.service_arguments' ]
+
     Torq\PimcoreHelpersBundle\Service\:
         resource: '../src/Service'
         public: true
