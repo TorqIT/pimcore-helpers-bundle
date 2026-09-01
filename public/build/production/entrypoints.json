@@ -1,0 +1,33 @@
+{
+  "entrypoints": {
+    "main": {
+      "js": [
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/363.f2ad9849.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/978.b0f91865.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/451.bd5563a2.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/77.e180f425.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/451.bd5563a2.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/814.466384fe.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/main.e00cecac.js"
+      ],
+      "css": []
+    },
+    "pimcore_helpers_bundle": {
+      "js": [
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/363.f2ad9849.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/978.b0f91865.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/451.bd5563a2.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/__federation_expose_default_export.7fadb2fc.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/async/77.e180f425.js",
+        "/bundles/torqpimcorehelpers/build/production/static/js/remoteEntry.js"
+      ],
+      "css": []
+    },
+    "exposeRemote": {
+      "js": [
+        "/bundles/torqpimcorehelpers/build/production/exposeRemote.js"
+      ],
+      "css": []
+    }
+  }
+}
