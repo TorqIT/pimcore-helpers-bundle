@@ -11,48 +11,58 @@ export function QuickActions() {
     const [isOpen, setIsOpen] = useState(false);
 
     return isAllowed(PERMISSION) ? (
-        <>
-            <Button icon={<ThunderboltOutlined />} onClick={() => setIsOpen(true)} type={"text"} />
-            <Modal
-                open={isOpen}
-                onCancel={() => setIsOpen(false)}
-                destroyOnClose
-                footer={[
-                    <Button key={"back"} onClick={() => setIsOpen(false)}>
-                        Close
-                    </Button>,
-                ]}
-                title={
-                    <Typography style={{ color: token.colorPrimary }}>
-                        <ThunderboltOutlined /> Quick Actions
-                    </Typography>
-                }
+      <>
+        <Button
+          icon={ <ThunderboltOutlined /> }
+          onClick={ () => setIsOpen(true) }
+          type={ "text" }
+        />
+        <Modal
+          destroyOnClose
+          footer={ [
+            <Button
+              key={ "back" }
+              onClick={ () => setIsOpen(false) }
             >
-                <Flex vertical gap={2}>
-                    <QuickActionListItem
-                        icon={<ReloadOutlined />}
-                        name={"Native Reindex"}
-                        tooltip={
-                            "Native search engine reindex (reorganizes data within existing indices, no database read)"
-                        }
-                        onClick={() =>
+              Close
+            </Button>,
+                ] }
+          onCancel={ () => setIsOpen(false) }
+          open={ isOpen }
+          title={
+            <Typography style={ { color: token.colorPrimary } }>
+              <ThunderboltOutlined /> Quick Actions
+            </Typography>
+                }
+        >
+          <Flex
+            gap={ 2 }
+            vertical
+          >
+            <QuickActionListItem
+              icon={ <ReloadOutlined /> }
+              name={ "Native Reindex" }
+              onClick={ () =>
                             fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/native-reindex", { method: "POST" })
                         }
-                    />
-                    <QuickActionListItem
-                        icon={<FileSearchOutlined />}
-                        name={"Reindex from Database"}
-                        tooltip={"Update index mappings and queue all elements for reindex from the database"}
-                        onClick={() => fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/reindex", { method: "POST" })}
-                    />
-                    <QuickActionListItem
-                        icon={<FileSyncOutlined />}
-                        name={"Recreate Indices"}
-                        tooltip={"Delete and recreate indices, then queue all elements"}
-                        onClick={() => fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/recreate", { method: "POST" })}
-                    />
-                </Flex>
-            </Modal>
-        </>
+              tooltip={
+                            "Native search engine reindex (reorganizes data within existing indices, no database read)"
+                        }
+            />
+            <QuickActionListItem
+              icon={ <FileSearchOutlined /> }
+              name={ "Reindex from Database" }
+              onClick={ () => fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/reindex", { method: "POST" }) }
+              tooltip={ "Update index mappings and queue all elements for reindex from the database" }
+            />
+            <QuickActionListItem
+              icon={ <FileSyncOutlined /> }
+              name={ "Recreate Indices" }
+              onClick={ () => fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/recreate", { method: "POST" }) }
+              tooltip={ "Delete and recreate indices, then queue all elements" }
+            />
+          </Flex>
+        </Modal>
+      </>
     ) : null;
 }

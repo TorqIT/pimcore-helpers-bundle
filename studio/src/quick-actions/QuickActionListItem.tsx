@@ -29,34 +29,34 @@ export function QuickActionListItem({ icon, name, onClick, tooltip }: QuickActio
     }
 
     return (
-        <>
-            <Button
-                icon={
+      <>
+        <Button
+          icon={
                     isError ? (
-                        <ExclamationCircleOutlined style={{ color: token.colorError }} />
+                      <ExclamationCircleOutlined style={ { color: token.colorError } } />
                     ) : isComplete ? (
-                        <CheckOutlined style={{ color: token.colorSuccess }} />
+                      <CheckOutlined style={ { color: token.colorSuccess } } />
                     ) : (
                         icon
                     )
                 }
-                type={"text"}
-                loading={isLoading}
-                onClick={call}
-                style={{ width: "100%", justifyContent: "start" }}
-            >
-                <Typography>{name}</Typography>
-                {tooltip && (
-                    <Tooltip title={tooltip}>
-                        <InfoCircleOutlined style={{ color: token.colorTextSecondary, marginLeft: 4 }} />
-                    </Tooltip>
+          loading={ isLoading }
+          onClick={ call }
+          style={ { width: "100%", justifyContent: "start" } }
+          type={ "text" }
+        >
+          <Typography>{name}</Typography>
+          {tooltip && (
+            <Tooltip title={ tooltip }>
+              <InfoCircleOutlined style={ { color: token.colorTextSecondary, marginLeft: 4 } } />
+            </Tooltip>
                 )}
-                {isError && (
-                    <Flex justify={"end"}>
-                        <Typography style={{ color: token.colorError }}>Action failed, please try again.</Typography>
-                    </Flex>
+          {isError && (
+            <Flex justify={ "end" }>
+              <Typography style={ { color: token.colorError } }>Action failed, please try again.</Typography>
+            </Flex>
                 )}
-            </Button>
-        </>
+        </Button>
+      </>
     );
 }
