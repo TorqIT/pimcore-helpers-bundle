@@ -24,12 +24,10 @@ services:
 
     Torq\PimcoreHelpersBundle\Service\:
         resource: '../src/Service'
+        # Adapter/ depends on Studio Backend classes; registered conditionally in studio_backend_services.yaml
+        exclude: '../src/Service/Adapter'
         public: true
 
     Torq\PimcoreHelpersBundle\Repository\:
         resource: '../src/Repository'
-        public: true
-
-    Torq\PimcoreHelpersBundle\Webpack\:
-        resource: '../src/Webpack'
         public: true
