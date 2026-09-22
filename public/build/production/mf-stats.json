@@ -20,7 +20,7 @@
       "api": ""
     },
     "globalName": "pimcore_helpers_bundle",
-    "pluginVersion": "2.9.0",
+    "pluginVersion": "2.9.1",
     "publicPath": "/bundles/torqpimcorehelpers/build/production/"
   },
   "shared": [
