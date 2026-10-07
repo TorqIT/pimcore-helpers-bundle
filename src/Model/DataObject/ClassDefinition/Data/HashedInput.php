@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data;
 
 use Pimcore;
+use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\ClassDefinition\Data\Input;
+use Pimcore\Model\DataObject\ClassDefinition\Data\PreGetDataInterface;
 use Pimcore\Model\DataObject\Concrete;
 use RuntimeException;
 
@@ -19,24 +21,18 @@ use RuntimeException;
  *
  * Storage format: "ha2id:<64-char lowercase hex>" (~70 chars, fits varchar(190)).
  */
-class HashedInput extends Input
+class HashedInput extends Input implements DataObject\ClassDefinition\Data\PreSetDataInterface
 {
     private const string HASH_PREFIX = 'ha2id:';
     private const string EDIT_PLACEHOLDER = '••••••••';
 
-    public function getDataForResource(mixed $data, ?Concrete $object = null, array $params = []): ?string
+    public function preSetData(mixed $container, mixed $data, array $params = []): mixed
     {
-        $data = $this->handleDefaultValue($data, $object, $params);
-
-        if ($data === null || $data === '') {
-            return null;
-        }
-
-        if (str_starts_with((string) $data, self::HASH_PREFIX)) {
+        if (str_starts_with((string)$data, self::HASH_PREFIX)) {
             return $data;
         }
 
-        return $this->computeHash((string) $data);
+        return $this->computeHash((string)$data);
     }
 
     public function getDataForEditmode(mixed $data, ?Concrete $object = null, array $params = []): ?string
