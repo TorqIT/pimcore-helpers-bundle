@@ -7,7 +7,6 @@ namespace Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data;
 use Pimcore;
 use Pimcore\Model\DataObject;
 use Pimcore\Model\DataObject\ClassDefinition\Data\Input;
-use Pimcore\Model\DataObject\ClassDefinition\Data\PreGetDataInterface;
 use Pimcore\Model\DataObject\Concrete;
 use RuntimeException;
 
@@ -28,6 +27,10 @@ class HashedInput extends Input implements DataObject\ClassDefinition\Data\PreSe
 
     public function preSetData(mixed $container, mixed $data, array $params = []): mixed
     {
+        if ($data === null || $data === '') {
+            return null;
+        }
+
         if (str_starts_with((string)$data, self::HASH_PREFIX)) {
             return $data;
         }
