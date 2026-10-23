@@ -63,13 +63,23 @@ class AssetMetadataNormalizer implements NormalizerInterface, DenormalizerInterf
         return match ($type) {
             AssetMetadataType::ASSET => $this->assetRepository->getById((int)$value),
             AssetMetadataType::OBJECT => $this->objectRepository->getById((int)$value),
-            AssetMetadataType::DATE, AssetMetadataType::DATETIME => $value ? Carbon::parse($value) : null,
+            AssetMetadataType::DATE, AssetMetadataType::DATETIME => $this->deserializeDate($value),
             AssetMetadataType::CHECKBOX => (bool)$value,
             AssetMetadataType::MULTISELECT => explode(',', $value),
             AssetMetadataType::MANY_TO_MANY_RELATION => $this->deserializeManyToManyRelation($value),
             AssetMetadataType::DOCUMENT => throw new Exception('Asset metadata type `document` not yet supported.'),
             default => $value,
         };
+    }
+
+    // Pimcore persists date and datetime metadata as a unix timestamp, which Carbon::parse() rejects.
+    private function deserializeDate(mixed $value): ?Carbon
+    {
+        if (!$value) {
+            return null;
+        }
+
+        return is_numeric($value) ? Carbon::createFromTimestamp((int)$value) : Carbon::parse($value);
     }
 
     private function deserializeManyToManyRelation(string $value)
