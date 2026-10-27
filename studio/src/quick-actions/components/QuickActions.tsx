@@ -19,6 +19,7 @@ export function QuickActions() {
         <>
             <Button icon={<ThunderboltOutlined />} onClick={() => setIsOpen(true)} type={"text"} />
             <Modal
+                forceRender // skip useMemo check on children so reactive to isOpen
                 footer={[
                     <Button key={"back"} onClick={() => setIsOpen(false)}>
                         Close
@@ -33,13 +34,15 @@ export function QuickActions() {
                 }
             >
                 <Flex gap={2} vertical>
-                    {actions.map(({ title, icon, description, onClick, getProgress }) => (
+                    {actions.map(({ id, title, icon, description, onClick, getProgress }) => (
                         <QuickAction
+                            key={id}
                             title={title}
                             icon={icon}
                             description={description}
                             onClick={onClick}
                             getProgress={getProgress}
+                            isOpen={isOpen}
                         />
                     ))}
                 </Flex>

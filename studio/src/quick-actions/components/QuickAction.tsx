@@ -1,31 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Flex, theme, Tooltip, Typography } from "antd";
 import { CheckOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { AbstractQuickAction } from "../dynamic-types/QuickActionRegistry";
 
 export interface QuickActionProps extends Omit<AbstractQuickAction, "id" | "permission"> {
     id?: string;
+    isOpen?: boolean;
 }
 
-export function QuickAction({ icon, title, onClick, description }: QuickActionProps) {
+export function QuickAction({ icon, title, onClick, description, isOpen }: QuickActionProps) {
     const { token } = theme.useToken();
     const [isLoading, setIsLoading] = useState(false);
     const [isComplete, setIsComplete] = useState(false);
     const [isError, setIsError] = useState(false);
 
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        if (isComplete && isOpen) {
+            timer = setTimeout(() => setIsComplete(false), 3000);
+        }
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [isComplete, isOpen]);
+
     async function call() {
         setIsError(false);
         setIsComplete(false);
         setIsLoading(true);
-        const res = await onClick();
-        if (res) {
-            if (res.ok) {
-                setIsComplete(true);
-            } else {
+
+        try {
+            const res = await onClick();
+            if (res && !res.ok) {
                 setIsError(true);
+            } else {
+                setIsComplete(true);
             }
+        } catch (e) {
+            setIsError(true);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }
 
     return (
