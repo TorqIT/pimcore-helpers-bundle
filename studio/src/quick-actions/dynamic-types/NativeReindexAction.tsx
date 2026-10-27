@@ -12,7 +12,10 @@ export class NativeReindexAction extends AbstractQuickAction {
     description = "Native search engine reindex (reorganizes data within existing indices, no database read)";
     permission = "generic_data_index_tool";
 
-    async onClick() {
-        await fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/native-reindex", { method: "POST" });
-    }
+    onClick = async (signal?: AbortSignal) => {
+        await fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/native-reindex", {
+            method: "POST",
+            signal,
+        });
+    };
 }

@@ -12,7 +12,10 @@ export class ReindexFromDatabaseAction extends AbstractQuickAction {
     description = "Update index mappings and queue all elements for reindex from the database";
     permission = "generic_data_index_tool";
 
-    async onClick() {
-        await fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/reindex", { method: "POST" });
-    }
+    onClick = async (signal?: AbortSignal) => {
+        await fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/reindex", {
+            method: "POST",
+            signal,
+        });
+    };
 }

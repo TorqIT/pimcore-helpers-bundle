@@ -12,7 +12,10 @@ export class RecreateIndicesAction extends AbstractQuickAction {
     description = "Delete and recreate indices, then queue all elements";
     permission = "generic_data_index_tool";
 
-    async onClick() {
-        await fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/recreate", { method: "POST" });
-    }
+    onClick = async (signal?: AbortSignal) => {
+        await fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/recreate", {
+            method: "POST",
+            signal,
+        });
+    };
 }

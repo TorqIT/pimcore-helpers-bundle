@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Flex, theme, Tooltip, Typography } from "antd";
-import { CheckOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloseOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { AbstractQuickAction } from "../dynamic-types/QuickActionRegistry";
 
 export interface QuickActionProps extends Omit<AbstractQuickAction, "id" | "permission"> {
@@ -8,11 +8,23 @@ export interface QuickActionProps extends Omit<AbstractQuickAction, "id" | "perm
     isOpen?: boolean;
 }
 
-export function QuickAction({ icon, title, onClick, description, isOpen }: QuickActionProps) {
+export function QuickAction({
+    icon,
+    title,
+    onClick,
+    description,
+    isOpen,
+    pollProgress,
+    getProgress,
+    onCancel,
+}: QuickActionProps) {
     const { token } = theme.useToken();
     const [isLoading, setIsLoading] = useState(false);
     const [isComplete, setIsComplete] = useState(false);
     const [isError, setIsError] = useState(false);
+
+    const controller = useRef<AbortController>();
+    useEffect(() => () => controller.current?.abort(), []);
 
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout> | undefined;
@@ -26,53 +38,77 @@ export function QuickAction({ icon, title, onClick, description, isOpen }: Quick
     }, [isComplete, isOpen]);
 
     async function call() {
+        controller.current = new AbortController();
+
         setIsError(false);
         setIsComplete(false);
         setIsLoading(true);
 
         try {
-            const res = await onClick();
-            if (res && !res.ok) {
-                setIsError(true);
+            if (!pollProgress) {
+                const res = await onClick(controller.current.signal);
+                if (res && !res.ok) {
+                    setIsError(true);
+                } else {
+                    setIsComplete(true);
+                }
+                setIsLoading(false);
             } else {
-                setIsComplete(true);
+                void onClick(controller.current.signal);
             }
         } catch (e) {
-            setIsError(true);
-        } finally {
+            if (!controller.current.signal.aborted) {
+                setIsError(true);
+            }
             setIsLoading(false);
         }
     }
 
+    async function cancel() {
+        controller.current?.abort("User cancelled operation");
+        onCancel?.();
+    }
+
     return (
         <>
-            <Button
-                icon={
-                    isError ? (
-                        <ExclamationCircleOutlined style={{ color: token.colorError }} />
-                    ) : isComplete ? (
-                        <CheckOutlined style={{ color: token.colorSuccess }} />
-                    ) : (
-                        icon
-                    )
-                }
-                loading={isLoading}
-                onClick={call}
-                style={{ width: "100%", justifyContent: "start" }}
-                type={"text"}
-            >
-                <Typography>{title}</Typography>
-                {description && (
-                    <Tooltip title={description}>
-                        <InfoCircleOutlined style={{ color: token.colorTextSecondary, marginLeft: 4 }} />
-                    </Tooltip>
-                )}
-                {isError && (
-                    <Flex justify={"end"}>
-                        <Typography style={{ color: token.colorError }}>Action failed, please try again.</Typography>
-                    </Flex>
-                )}
-            </Button>
+            <Flex gap={2} justify={"space-between"}>
+                <Button
+                    icon={
+                        isError ? (
+                            <ExclamationCircleOutlined style={{ color: token.colorError }} />
+                        ) : isComplete ? (
+                            <CheckOutlined style={{ color: token.colorSuccess }} />
+                        ) : (
+                            icon
+                        )
+                    }
+                    loading={isLoading}
+                    onClick={call}
+                    style={{ width: "100%", justifyContent: "start" }}
+                    type={"text"}
+                >
+                    <Typography>{title}</Typography>
+                    {isError && (
+                        <Flex justify={"end"}>
+                            <Typography style={{ color: token.colorError }}>
+                                Action failed, please try again.
+                            </Typography>
+                        </Flex>
+                    )}
+                    {description && (
+                        <Tooltip title={description}>
+                            <InfoCircleOutlined style={{ color: token.colorTextSecondary, marginLeft: 4 }} />
+                        </Tooltip>
+                    )}
+                </Button>
+                <Button
+                    type={"text"}
+                    icon={<CloseOutlined />}
+                    style={{ visibility: !isLoading ? "hidden" : "visible" }}
+                    disabled={!isLoading}
+                    onClick={cancel}
+                />
+            </Flex>
         </>
     );
 }

@@ -8,12 +8,14 @@ export const QUICK_ACTION_REGISTRY_SERVICE_ID = "quickActionRegistry";
 export abstract class AbstractQuickAction extends DynamicTypeAbstract {
     abstract readonly id: string;
     abstract readonly title: string;
-    abstract onClick(): Promise<Response | void>;
     abstract readonly permission: string | null;
+    abstract onClick: (signal: AbortSignal) => Promise<Response | void>;
 
     readonly icon?: ReactNode;
     readonly description?: string;
-    async getProgress(): Promise<number | void> {}
+    readonly pollProgress?: boolean;
+    getProgress?: () => Promise<number | void>;
+    onCancel?: () => Promise<void>;
 }
 
 @injectable()
