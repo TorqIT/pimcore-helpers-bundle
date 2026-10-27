@@ -1,68 +1,49 @@
 import { useState } from "react";
-import { FileSearchOutlined, FileSyncOutlined, ThunderboltOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Button, Flex, Modal, Typography, theme } from "antd";
-import { QuickActionListItem } from "./QuickActionListItem";
+import { ThunderboltOutlined } from "@ant-design/icons";
+import { Button, Flex, Modal, theme, Typography } from "antd";
+import { QuickAction } from "./QuickAction";
 import { isAllowed } from "@pimcore/studio-ui-bundle/modules/auth";
+import { QUICK_ACTION_REGISTRY_SERVICE_ID, QuickActionRegistry } from "./QuickActionRegistry";
+import { container } from "@pimcore/studio-ui-bundle";
 
-const PERMISSION = "generic_data_index_tool";
+const PERMISSION = "quick_actions";
 
 export function QuickActions() {
     const { token } = theme.useToken();
     const [isOpen, setIsOpen] = useState(false);
 
+    const registry = container.get<QuickActionRegistry>(QUICK_ACTION_REGISTRY_SERVICE_ID);
+    const actions = registry.getDynamicTypes().filter(({ permission }) => !permission || isAllowed(permission));
+
     return isAllowed(PERMISSION) ? (
-      <>
-        <Button
-          icon={ <ThunderboltOutlined /> }
-          onClick={ () => setIsOpen(true) }
-          type={ "text" }
-        />
-        <Modal
-          destroyOnClose
-          footer={ [
-            <Button
-              key={ "back" }
-              onClick={ () => setIsOpen(false) }
-            >
-              Close
-            </Button>,
-                ] }
-          onCancel={ () => setIsOpen(false) }
-          open={ isOpen }
-          title={
-            <Typography style={ { color: token.colorPrimary } }>
-              <ThunderboltOutlined /> Quick Actions
-            </Typography>
+        <>
+            <Button icon={<ThunderboltOutlined />} onClick={() => setIsOpen(true)} type={"text"} />
+            <Modal
+                footer={[
+                    <Button key={"back"} onClick={() => setIsOpen(false)}>
+                        Close
+                    </Button>,
+                ]}
+                onCancel={() => setIsOpen(false)}
+                open={isOpen}
+                title={
+                    <Typography style={{ color: token.colorPrimary }}>
+                        <ThunderboltOutlined /> Quick Actions
+                    </Typography>
                 }
-        >
-          <Flex
-            gap={ 2 }
-            vertical
-          >
-            <QuickActionListItem
-              icon={ <ReloadOutlined /> }
-              name={ "Native Reindex" }
-              onClick={ () =>
-                            fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/native-reindex", { method: "POST" })
-                        }
-              tooltip={
-                            "Native search engine reindex (reorganizes data within existing indices, no database read)"
-                        }
-            />
-            <QuickActionListItem
-              icon={ <FileSearchOutlined /> }
-              name={ "Reindex from Database" }
-              onClick={ () => fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/reindex", { method: "POST" }) }
-              tooltip={ "Update index mappings and queue all elements for reindex from the database" }
-            />
-            <QuickActionListItem
-              icon={ <FileSyncOutlined /> }
-              name={ "Recreate Indices" }
-              onClick={ () => fetch("/pimcore-studio/api/pimcore-helpers/generic-data-index/recreate", { method: "POST" }) }
-              tooltip={ "Delete and recreate indices, then queue all elements" }
-            />
-          </Flex>
-        </Modal>
-      </>
+            >
+                <Flex gap={2} vertical>
+                    {actions.map(({ title, icon, description, onClick, getProgress }) => (
+                        <QuickAction
+                            title={title}
+                            icon={icon}
+                            description={description}
+                            onClick={onClick}
+                            getProgress={getProgress}
+                        />
+                    ))}
+                </Flex>
+            </Modal>
+        </>
     ) : null;
 }
