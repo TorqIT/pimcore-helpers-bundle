@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Flex, Progress, theme, Tooltip, Typography } from "antd";
 import { CheckOutlined, CloseOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { AbstractQuickAction } from "../dynamic-types/QuickActionRegistry";
-import { Progressbar } from "@pimcore/studio-ui-bundle/components";
 
 export interface QuickActionProps extends Omit<AbstractQuickAction, "id" | "permission"> {
     id?: string;
@@ -27,27 +26,38 @@ export function QuickAction({
     const [progress, setProgress] = useState<number>();
 
     useEffect(() => {
-        if (pollProgress && getProgress) {
-            getProgress().then((value) => {
-                if (value > 0 && value != 100) {
-                    setIsProgressing(true);
-                }
-            });
+        if (isOpen && pollProgress && getProgress) {
+            getProgress()
+                .then((value) => {
+                    if (value !== undefined && value !== 100) {
+                        setIsError(false);
+                        setProgress(value);
+                        setIsProgressing(true);
+                    }
+                })
+                .catch(() => {});
         }
-    }, [pollProgress, getProgress]);
+    }, [isOpen, pollProgress, getProgress]);
 
     useEffect(() => {
         let interval: ReturnType<typeof setInterval> | undefined;
         if (isProgressing && getProgress) {
             interval = setInterval(async () => {
-                const value = await getProgress();
-                if (value >= 100) {
+                try {
+                    const value = await getProgress();
+                    if (value === undefined || value >= 100) {
+                        setIsProgressing(false);
+                        setProgress(undefined);
+                        clearInterval(interval);
+                        setIsComplete(true);
+                    } else {
+                        setProgress(value);
+                    }
+                } catch (e) {
+                    setIsError(true);
                     setIsProgressing(false);
                     setProgress(undefined);
-                    setIsComplete(true);
                     clearInterval(interval);
-                } else {
-                    setProgress(value);
                 }
             }, 5000);
         }
@@ -99,10 +109,14 @@ export function QuickAction({
     }
 
     async function cancel() {
-        controller.current?.abort("User cancelled operation");
-        setIsProgressing(false);
-        setProgress(undefined);
-        onCancel?.();
+        try {
+            controller.current?.abort("User cancelled operation");
+            setIsProgressing(false);
+            setProgress(undefined);
+            await onCancel?.();
+        } catch (e) {
+            setIsError(true);
+        }
     }
 
     return (
