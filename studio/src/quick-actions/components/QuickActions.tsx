@@ -37,16 +37,9 @@ export function QuickActions() {
                 }
             >
                 <Flex gap={2} vertical>
-                    {actions.map(({ id, title, icon, description, onClick, getProgress }, index) => (
+                    {actions.map(({ id, ...action }, index) => (
                         <div key={id} hidden={!isOnPage(index)}>
-                            <QuickAction
-                                title={title}
-                                icon={icon}
-                                description={description}
-                                onClick={onClick}
-                                getProgress={getProgress}
-                                isOpen={isOpen}
-                            />
+                            <QuickAction {...action} isOpen={isOpen} />
                         </div>
                     ))}
                 </Flex>

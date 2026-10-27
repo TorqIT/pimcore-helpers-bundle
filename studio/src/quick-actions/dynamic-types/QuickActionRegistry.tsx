@@ -14,7 +14,7 @@ export abstract class AbstractQuickAction extends DynamicTypeAbstract {
     readonly icon?: ReactNode;
     readonly description?: string;
     readonly pollProgress?: boolean;
-    getProgress?: () => Promise<number | void>;
+    getProgress?: () => Promise<number>;
     onCancel?: () => Promise<void>;
 }
 
