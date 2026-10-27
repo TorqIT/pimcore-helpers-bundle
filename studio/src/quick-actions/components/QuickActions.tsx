@@ -3,7 +3,7 @@ import { ThunderboltOutlined } from "@ant-design/icons";
 import { Button, Flex, Modal, theme, Typography } from "antd";
 import { QuickAction } from "./QuickAction";
 import { isAllowed } from "@pimcore/studio-ui-bundle/modules/auth";
-import { QUICK_ACTION_REGISTRY_SERVICE_ID, QuickActionRegistry } from "./QuickActionRegistry";
+import { QUICK_ACTION_REGISTRY_SERVICE_ID, QuickActionRegistry } from "../dynamic-types/QuickActionRegistry";
 import { container } from "@pimcore/studio-ui-bundle";
 
 const PERMISSION = "quick_actions";

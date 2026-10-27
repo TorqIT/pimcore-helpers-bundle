@@ -52,15 +52,26 @@ export default defineConfig({
         },
     },
     plugins: [
-        pluginGenerateEntrypoints(),
+        pluginGenerateEntrypoints({ alternativePluginExportPath: "/plugins" }),
         pluginReact(),
         pluginModuleFederation({
             name: "pimcore_helpers_bundle",
+            dev: {
+                disableDynamicRemoteTypeHints: true,
+            },
             filename: "static/js/remoteEntry.js",
             exposes: {
-                ".": "./src/main.ts",
+                "./plugins": "./src/main.ts",
+                ".": "./src/sdk.ts",
             },
-            dts: false,
+            dts: inDevelopment
+                ? {
+                      generateTypes: {
+                          tsConfigPath: "./tsconfig.types.json",
+                      },
+                      consumeTypes: false,
+                  }
+                : false,
             remotes: {
                 "@pimcore/studio-ui-bundle": createDynamicRemote("pimcore_studio_ui_bundle"),
             },

@@ -1,4 +1,4 @@
-import { AbstractQuickAction } from "../QuickActionRegistry";
+import { AbstractQuickAction } from "./QuickActionRegistry";
 import { injectable } from "@pimcore/studio-ui-bundle/app";
 import { FileSearchOutlined } from "@ant-design/icons";
 

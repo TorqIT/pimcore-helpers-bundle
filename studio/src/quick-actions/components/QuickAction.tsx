@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Flex, theme, Tooltip, Typography } from "antd";
 import { CheckOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
-import { AbstractQuickAction } from "./QuickActionRegistry";
+import { AbstractQuickAction } from "../dynamic-types/QuickActionRegistry";
 
 export interface QuickActionProps extends Omit<AbstractQuickAction, "id" | "permission"> {
     id?: string;
