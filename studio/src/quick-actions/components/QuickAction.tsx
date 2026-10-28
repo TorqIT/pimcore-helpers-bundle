@@ -53,7 +53,7 @@ export function QuickAction({
                     } else {
                         setProgress(value);
                     }
-                } catch (e) {
+                } catch {
                     setIsError(true);
                     setIsProgressing(false);
                     setProgress(undefined);
@@ -99,7 +99,7 @@ export function QuickAction({
                     setIsComplete(true);
                 }
             }
-        } catch (e) {
+        } catch {
             if (!controller.current.signal.aborted) {
                 setIsError(true);
             }
@@ -114,7 +114,7 @@ export function QuickAction({
             setIsProgressing(false);
             setProgress(undefined);
             await onCancel?.();
-        } catch (e) {
+        } catch {
             setIsError(true);
         }
     }
