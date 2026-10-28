@@ -138,6 +138,11 @@ export function QuickAction({
                     type={"text"}
                 >
                     <Typography>{title}</Typography>
+                    {description && (
+                        <Tooltip title={description}>
+                            <InfoCircleOutlined style={{ color: token.colorTextSecondary, marginLeft: 4 }} />
+                        </Tooltip>
+                    )}
                     {isError && (
                         <Flex justify={"end"}>
                             <Typography style={{ color: token.colorError }}>
@@ -146,11 +151,6 @@ export function QuickAction({
                         </Flex>
                     )}
                     {isProgressing && <Progress percent={progress} strokeColor={token.colorPrimary} />}
-                    {description && (
-                        <Tooltip title={description}>
-                            <InfoCircleOutlined style={{ color: token.colorTextSecondary, marginLeft: 4 }} />
-                        </Tooltip>
-                    )}
                 </Button>
                 <Button
                     type={"text"}
