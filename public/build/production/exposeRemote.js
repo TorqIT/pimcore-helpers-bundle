@@ -9,5 +9,5 @@
 
       window.pluginRemotes.pimcore_helpers_bundle = "/bundles/torqpimcorehelpers/build/production/static/js/remoteEntry.js"
 
-      
+      window.alternativePluginExportPaths.pimcore_helpers_bundle = "/plugins"
     
