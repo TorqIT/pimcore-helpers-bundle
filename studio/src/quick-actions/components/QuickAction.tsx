@@ -133,7 +133,7 @@ export function QuickAction({
                         )
                     }
                     loading={isLoading}
-                    onClick={call}
+                    onClick={!isProgressing ? call : undefined}
                     style={{ width: "100%", justifyContent: "start" }}
                     type={"text"}
                 >
