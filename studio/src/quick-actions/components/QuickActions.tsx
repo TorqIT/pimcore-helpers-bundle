@@ -19,43 +19,62 @@ export function QuickActions() {
     const isOnPage = (index: number) => Math.floor(index / PAGE_SIZE) + 1 === page;
 
     return isAllowed(PERMISSION) ? (
-        <>
-            <Button icon={<ThunderboltOutlined />} onClick={() => setIsOpen(true)} type={"text"} />
-            <Modal
-                forceRender // skip useMemo check on children so reactive to isOpen
-                footer={[
-                    <Button key={"back"} onClick={() => setIsOpen(false)}>
-                        Close
-                    </Button>,
-                ]}
-                onCancel={() => setIsOpen(false)}
-                open={isOpen}
-                title={
-                    <Typography style={{ color: token.colorPrimary }}>
-                        <ThunderboltOutlined /> Quick Actions
-                    </Typography>
-                }
+      <>
+        <Button
+          icon={ <ThunderboltOutlined /> }
+          onClick={ () => setIsOpen(true) }
+          type={ "text" }
+        />
+        <Modal
+          footer={ [
+            <Button
+              key={ "back" }
+              onClick={ () => setIsOpen(false) }
             >
-                <Flex gap={2} vertical>
-                    {actions.map(({ id, ...action }, index) => (
-                        <div key={id} hidden={!isOnPage(index)}>
-                            <QuickAction {...action} isOpen={isOpen} />
-                        </div>
+              Close
+            </Button>,
+                ] }
+          forceRender // skip useMemo check on children so reactive to isOpen
+          onCancel={ () => setIsOpen(false) }
+          open={ isOpen }
+          title={
+            <Typography style={ { color: token.colorPrimary } }>
+              <ThunderboltOutlined /> Quick Actions
+            </Typography>
+                }
+        >
+          <Flex
+            gap={ 2 }
+            vertical
+          >
+            {actions.map(({ id, ...action }, index) => (
+              <div
+                hidden={ !isOnPage(index) }
+                key={ id }
+              >
+                <QuickAction
+                  { ...action }
+                  isOpen={ isOpen }
+                />
+              </div>
                     ))}
-                </Flex>
-                {actions.length > PAGE_SIZE && (
-                    <Flex justify={"center"} style={{ marginTop: token.marginSM }}>
-                        <Pagination
-                            current={page}
-                            onChange={setPage}
-                            pageSize={PAGE_SIZE}
-                            showSizeChanger={false}
-                            showQuickJumper={false}
-                            total={actions.length}
-                        />
-                    </Flex>
+          </Flex>
+          {actions.length > PAGE_SIZE && (
+            <Flex
+              justify={ "center" }
+              style={ { marginTop: token.marginSM } }
+            >
+              <Pagination
+                current={ page }
+                onChange={ setPage }
+                pageSize={ PAGE_SIZE }
+                showQuickJumper={ false }
+                showSizeChanger={ false }
+                total={ actions.length }
+              />
+            </Flex>
                 )}
-            </Modal>
-        </>
+        </Modal>
+      </>
     ) : null;
 }

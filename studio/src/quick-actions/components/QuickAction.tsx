@@ -120,46 +120,54 @@ export function QuickAction({
     }
 
     return (
-        <>
-            <Flex gap={2} justify={"space-between"}>
-                <Button
-                    icon={
+      <>
+        <Flex
+          gap={ 2 }
+          justify={ "space-between" }
+        >
+          <Button
+            icon={
                         isError ? (
-                            <ExclamationCircleOutlined style={{ color: token.colorError }} />
+                          <ExclamationCircleOutlined style={ { color: token.colorError } } />
                         ) : isComplete ? (
-                            <CheckOutlined style={{ color: token.colorSuccess }} />
+                          <CheckOutlined style={ { color: token.colorSuccess } } />
                         ) : (
                             icon
                         )
                     }
-                    loading={isLoading}
-                    onClick={!isProgressing ? call : undefined}
-                    style={{ width: "100%", justifyContent: "start" }}
-                    type={"text"}
-                >
-                    <Typography>{title}</Typography>
-                    {description && (
-                        <Tooltip title={description}>
-                            <InfoCircleOutlined style={{ color: token.colorTextSecondary, marginLeft: 4 }} />
-                        </Tooltip>
+            loading={ isLoading }
+            onClick={ !isProgressing ? call : undefined }
+            style={ { width: "100%", justifyContent: "start" } }
+            type={ "text" }
+          >
+            <Typography>{title}</Typography>
+            {description && (
+            <Tooltip title={ description }>
+              <InfoCircleOutlined style={ { color: token.colorTextSecondary, marginLeft: 4 } } />
+            </Tooltip>
                     )}
-                    {isError && (
-                        <Flex justify={"end"}>
-                            <Typography style={{ color: token.colorError }}>
-                                Action failed, please try again.
-                            </Typography>
-                        </Flex>
-                    )}
-                    {isProgressing && <Progress percent={progress} strokeColor={token.colorPrimary} />}
-                </Button>
-                <Button
-                    type={"text"}
-                    icon={<CloseOutlined />}
-                    style={{ visibility: isLoading || isProgressing ? "visible" : "hidden" }}
-                    disabled={!isLoading && !isProgressing}
-                    onClick={cancel}
-                />
+            {isError && (
+            <Flex justify={ "end" }>
+              <Typography style={ { color: token.colorError } }>
+                Action failed, please try again.
+              </Typography>
             </Flex>
-        </>
+                    )}
+            {isProgressing && (
+            <Progress
+              percent={ progress }
+              strokeColor={ token.colorPrimary }
+            />
+)}
+          </Button>
+          <Button
+            disabled={ !isLoading && !isProgressing }
+            icon={ <CloseOutlined /> }
+            onClick={ cancel }
+            style={ { visibility: isLoading || isProgressing ? "visible" : "hidden" } }
+            type={ "text" }
+          />
+        </Flex>
+      </>
     );
 }
