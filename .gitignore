@@ -22,6 +22,8 @@ nbproject
 
 # npm
 node_modules
+/studio/.mf
+/studio/@mf-types
 
 # Test env
 /bin

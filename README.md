@@ -46,6 +46,72 @@ database
 table and are only run once by default. Set `#[AsStartupCommand(repeatable: true)]` to define a command which should be
 run every time.
 
+## Studio Quick Actions
+
+Quick Actions are simple one-click commands – queue a job, clear a cache, trigger a resync. Requires the
+`quick_actions` permission to use.
+
+![quick-actions-demo.gif](docs/quick-actions/quick-actions-demo.gif)
+
+### Defining custom actions
+
+To define a quick action, set up the bundle as a Module Federation remote for your Studio extension:
+
+```typescript
+// rsbuild.config.ts
+
+import {defineConfig} from "@rsbuild/core";
+import {pluginModuleFederation} from "@module-federation/rsbuild-plugin";
+
+export default defineConfig({
+    // Set dts for development builds only, production builds do not need types
+    dts: {
+        consumeTypes: {
+            remoteTypeUrls: {
+                pimcore_helpers_bundle: {
+                    alias: "@torq/pimcore-helpers-bundle",
+                    zip: "http://localhost:3033/@mf-types.zip",
+                    api: "http://localhost:3033/@mf-types.d.ts",
+                },
+            },
+        },
+    },
+    plugins: [
+        pluginModuleFederation({
+            remotes: {
+                "@pimcore/studio-ui-bundle": createDynamicRemote("pimcore_studio_ui_bundle"),
+                "@torq/pimcore-helpers-bundle": createDynamicRemote("pimcore_helpers_bundle"),
+            },
+        })
+    ]
+})
+```
+
+Then register the action as a dynamic type using the registry:
+
+```typescript jsx
+// CustomQuickActionPlugin.tsx
+
+import {container, IAbstractPlugin} from "@pimcore/studio-ui-bundle";
+import {QUICK_ACTION_REGISTRY_SERVICE_ID, type QuickActionRegistry} from "@torq/pimcore-helpers-bundle";
+
+export const CustomQuickActionPlugin: IAbstractPlugin = {
+    name: "CustomQuickActionPlugin",
+
+    onInit({container}) {
+        const registry = container.get<QuickActionRegistry>(QUICK_ACTION_REGISTRY_SERVICE_ID);
+        registry.registerDynamicType({
+            id: "custom-quick-action",
+            title: "Custom Quick Action",
+            permission: "custom_action_permission", // set null for no permission. Users must still have quick_actions permission
+            onClick: async (signal?: AbortSignal) => {
+                await triggerCustomAction(signal);
+            },
+        });
+    },
+};
+```
+
 # License
 
 This bundle is licensed under the Pimcore Open Core License (POCL)
