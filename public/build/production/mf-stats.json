@@ -20,7 +20,7 @@
       "api": ""
     },
     "globalName": "pimcore_helpers_bundle",
-    "pluginVersion": "2.9.2",
+    "pluginVersion": "2.9.3",
     "publicPath": "/bundles/torqpimcorehelpers/build/production/"
   },
   "shared": [
@@ -64,7 +64,7 @@
         "js": {
           "async": [],
           "sync": [
-            "static/js/async/363.6c27b9b7.js"
+            "static/js/async/363.220adeb8.js"
           ]
         },
         "css": {
@@ -209,8 +209,8 @@
       "assets": {
         "js": {
           "sync": [
-            "static/js/451.bd5563a2.js",
-            "static/js/async/__federation_expose_plugins.667838a1.js"
+            "static/js/609.a4c799c9.js",
+            "static/js/async/__federation_expose_plugins.e47d5d8b.js"
           ],
           "async": [
             "static/js/async/978.b0f91865.js"
@@ -231,7 +231,7 @@
       "assets": {
         "js": {
           "sync": [
-            "static/js/async/__federation_expose_default_export.7b3195ec.js"
+            "static/js/async/__federation_expose_default_export.533a354f.js"
           ],
           "async": [
             "static/js/async/978.b0f91865.js"
