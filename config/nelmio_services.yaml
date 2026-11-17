@@ -1,0 +1,6 @@
+services:
+    # autoconfigure is off so the describer is only tagged once, with a priority ahead of Nelmio's object describer
+    Torq\PimcoreHelpersBundle\Service\Describer\DataObjectDescriber:
+        autowire: true
+        tags:
+            - { name: nelmio_api_doc.model_describer, priority: 10 }

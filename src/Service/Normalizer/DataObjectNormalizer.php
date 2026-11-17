@@ -2,7 +2,6 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Concrete as DataObject;
 use stdClass;
@@ -19,6 +18,31 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         AbstractObject::OBJECT_TYPE_VARIANT,
         AbstractObject::OBJECT_TYPE_FOLDER,
     ];
+
+    public function getDefaultContext(array $context): array
+    {
+        $defaults = [
+            HelperContextBuilder::INHERIT_VALUES => true,
+            HelperContextBuilder::INCLUDE_CHILDREN => false,
+            HelperContextBuilder::CHILD_TYPES => self::DEFAULT_CHILD_TYPES,
+        ];
+
+        $context = parent::getDefaultContext($context);
+        $relationsAsIds = $this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context);
+        if (!$relationsAsIds) {
+            $context = HelperContextBuilder::create()->withContext($context);
+            $context = $context->addExcludedFieldType('reverseObjectRelation');
+            $context = $context->toArray();
+        }
+
+        foreach ($defaults as $key => $default) {
+            if (!array_key_exists($key, $context)) {
+                $context[$key] = $default;
+            }
+        }
+
+        return $context;
+    }
 
     /** @param DataObject $data */
     protected function toStandardObject(mixed $data, ?string $format = null, array $context = []): stdClass
@@ -45,17 +69,6 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         }
 
         return $object;
-    }
-
-    protected function getFields(object $data, ?string $format = null, array $context = []): array
-    {
-        $relationsAsIds = $this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context);
-        if (!$relationsAsIds) {
-            $context = HelperContextBuilder::create()->withContext($context);
-            $context = $context->addExcludedFieldType('reverseObjectRelation');
-            $context = $context->toArray();
-        }
-        return parent::getFields($data, context: $context);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
