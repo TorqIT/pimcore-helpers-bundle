@@ -25,10 +25,7 @@ services:
     Torq\PimcoreHelpersBundle\Service\:
         resource: '../src/Service'
         # Adapter/ depends on Studio Backend classes; registered conditionally in studio_backend_services.yaml
-        # DataObjectDescriber depends on Nelmio API Doc classes; registered conditionally in nelmio_services.yaml
-        exclude:
-            - '../src/Service/Adapter'
-            - '../src/Service/Describer/DataObjectDescriber.php'
+        exclude: '../src/Service/Adapter'
         public: true
 
     Torq\PimcoreHelpersBundle\Repository\:

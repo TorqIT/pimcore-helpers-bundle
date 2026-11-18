@@ -10,6 +10,7 @@ use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use OpenApi\Annotations\Items;
 use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\ClassDefinition\Data as FieldDef;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\TypeInfo\Type;
@@ -19,6 +20,7 @@ use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\AbstractObjectNormalizer;
 
 /** Describes any model whose class is supported by a schema describing normalizer */
+#[AsTaggedItem(priority: 10)]
 class DataObjectDescriber implements ModelDescriberInterface, ModelRegistryAwareInterface
 {
     use ModelRegistryAwareTrait;

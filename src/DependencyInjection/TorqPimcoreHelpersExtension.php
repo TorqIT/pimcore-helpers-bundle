@@ -29,10 +29,6 @@ class TorqPimcoreHelpersExtension extends Extension implements PrependExtensionI
         if (isset($bundles['PimcoreStudioUiBundle'])) {
             $loader->load('studio_ui_services.yaml');
         }
-
-        if (isset($bundles['NelmioApiDocBundle'])) {
-            $loader->load('nelmio_services.yaml');
-        }
     }
 
     public function prepend(ContainerBuilder $container): void
