@@ -3,6 +3,7 @@ import { DynamicTypeAbstract, DynamicTypeRegistryAbstract } from "@pimcore/studi
 import { ReactNode } from "react";
 
 export const QUICK_ACTION_REGISTRY_SERVICE_ID = "quickActionRegistry";
+export const QUICK_ACTIONS_PERMISSION = "quick_actions";
 
 @injectable()
 export abstract class AbstractQuickAction extends DynamicTypeAbstract {
