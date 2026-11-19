@@ -21,27 +21,20 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
 
     public function getDefaultContext(array $context): array
     {
-        $defaults = [
+        $context = [
             HelperContextBuilder::INHERIT_VALUES => true,
             HelperContextBuilder::INCLUDE_CHILDREN => false,
             HelperContextBuilder::CHILD_TYPES => self::DEFAULT_CHILD_TYPES,
+            ...parent::getDefaultContext($context),
         ];
-
-        $context = parent::getDefaultContext($context);
-        $relationsAsIds = $this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context);
-        if (!$relationsAsIds) {
-            $context = HelperContextBuilder::create()->withContext($context);
-            $context = $context->addExcludedFieldType('reverseObjectRelation');
-            $context = $context->toArray();
+        if ($this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context)) {
+            return $context;
         }
 
-        foreach ($defaults as $key => $default) {
-            if (!array_key_exists($key, $context)) {
-                $context[$key] = $default;
-            }
-        }
-
-        return $context;
+        return HelperContextBuilder::create()
+            ->withContext($context)
+            ->addExcludedFieldType('reverseObjectRelation')
+            ->toArray();
     }
 
     /** @param DataObject $data */
