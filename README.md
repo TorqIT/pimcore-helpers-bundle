@@ -112,6 +112,12 @@ export const CustomQuickActionPlugin: IAbstractPlugin = {
 };
 ```
 
+### Opening the modal from elsewhere
+
+The Quick Actions modal is opened from a button in the left sidebar by default. `useQuickActionsModal()` returns
+`open` and `close` callbacks which work from any Studio component, so the modal can be opened from a different entry
+point.
+
 # License
 
 This bundle is licensed under the Pimcore Open Core License (POCL)
