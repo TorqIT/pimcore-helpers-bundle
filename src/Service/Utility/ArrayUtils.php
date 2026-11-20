@@ -19,10 +19,10 @@ class ArrayUtils
                     'You must supply a key to check for the given array (empty array of keys given)'
                 );
             } elseif (count($key) === 1) {
-                return $this->get($key[0], $array);
+                return $this->get($key[0], $array, $default);
             } else {
                 return key_exists($key[0], $array) && is_array($array[$key[0]])
-                    ? $this->get(array_slice($key, 1), $array[$key[0]])
+                    ? $this->get(array_slice($key, 1), $array[$key[0]], $default)
                     : $default;
             }
         } else {
