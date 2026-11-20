@@ -61,6 +61,35 @@ class ArrayUtilsTest extends PimcoreTestBootstrapped
         $this->assertNull($this->arrayUtils->get(["test", "inner", "bottom"], $payload));
     }
 
+    public function testDefaultOnMissingNestedKey()
+    {
+        $payload = [
+            "test" => [
+                "inner" => "My Value"
+            ]
+        ];
+
+        $this->assertEquals("fallback", $this->arrayUtils->get(["test", "other"], $payload, "fallback"));
+    }
+
+    public function testDefaultOnEmptyNestedArray()
+    {
+        $payload = [
+            "test" => []
+        ];
+
+        $this->assertEquals("fallback", $this->arrayUtils->get(["test", "inner"], $payload, "fallback"));
+    }
+
+    public function testDefaultOnMissingIntermediateKey()
+    {
+        $payload = [
+            "test" => "My Value"
+        ];
+
+        $this->assertEquals("fallback", $this->arrayUtils->get(["other", "inner"], $payload, "fallback"));
+    }
+
     public function testNullOnWrongTypeKey()
     {
         $payload = [
