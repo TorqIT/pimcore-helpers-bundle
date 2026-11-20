@@ -3,84 +3,56 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
-use Nelmio\ApiDocBundle\Describer\ModelRegistryAwareInterface;
-use Nelmio\ApiDocBundle\Describer\ModelRegistryAwareTrait;
+use DateTimeInterface;
 use Nelmio\ApiDocBundle\Model\Model;
-use Nelmio\ApiDocBundle\ModelDescriber\ModelDescriberInterface;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use OpenApi\Annotations\Items;
 use OpenApi\Annotations\Schema;
-use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\ClassDefinition\Data as FieldDef;
-use Pimcore\Model\DataObject\Data\ElementMetadata;
-use Pimcore\Model\DataObject\Data\Hotspotimage;
-use Pimcore\Model\DataObject\Data\ObjectMetadata;
-use Pimcore\Model\Element\ElementInterface;
+use Pimcore\Model\DataObject\Data\Consent;
+use Pimcore\Model\DataObject\Data\ExternalImage;
+use Pimcore\Model\DataObject\Data\Link;
+use Pimcore\Model\DataObject\Data\RgbaColor;
+use Pimcore\Model\DataObject\Data\UrlSlug;
 use stdClass;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Contracts\Service\Attribute\Required;
+use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
-#[AutoconfigureTag(self::TAG)]
-#[AutoconfigureTag('nelmio_api_doc.model_describer', ['priority' => 10])]
-abstract class AbstractObjectNormalizer implements NormalizerInterface, ModelDescriberInterface, ModelRegistryAwareInterface
+abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
 {
-    use ModelRegistryAwareTrait;
+    use DescribingNormalizerTrait;
+    use RelationsAsIdsTrait;
 
-    private const string TAG = 'torq.object_normalizer';
+    private const string BRICK_NAMESPACE = 'Pimcore\\Model\\DataObject\\Objectbrick\\Data\\';
+    private const string FIELD_COLLECTION_NAMESPACE = 'Pimcore\\Model\\DataObject\\Fieldcollection\\Data\\';
 
-    private const string DATA_OBJECT_NAMESPACE = 'Pimcore\\Model\\DataObject\\';
-    private const string BRICK_NAMESPACE = self::DATA_OBJECT_NAMESPACE . 'Objectbrick\\Data\\';
-
-    private const array STRING_TYPES = [
-        'input',
-        'textarea',
-        'wysiwyg',
-        'select',
-        'hashedInput',
-        'email',
-        'firstname',
-        'lastname',
-        'gender',
-        'country',
-        'language',
-        'time',
+    /** Value classes whose normalizers output a scalar */
+    private const array SCALAR_CLASSES = [
+        Link::class => 'string',
+        UrlSlug::class => 'string',
+        ExternalImage::class => 'string',
+        RgbaColor::class => 'string',
+        Consent::class => 'boolean',
     ];
 
-    private const array RELATION_FIELDS = [
-        'manyToOneRelation',
-        'image',
-        'video',
-        'hotspotimage',
-        'gallery',
-        'manyToManyRelation',
-        'manyToManyObjectRelation',
-        'advancedManyToManyRelation',
-        'advancedManyToManyObjectRelation',
-        'reverseObjectRelation',
-    ];
-
-    /** @var iterable<self> */
-    private iterable $otherObjectNormalizers;
+    private const array SINGLE_RELATION_FIELDS = ['manyToOneRelation', 'image', 'hotspotimage', 'video'];
 
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
         protected ArrayUtils $utils,
         protected FieldFetcher $fieldFetcher,
     ) {}
-
-    #[Required]
-    public function setOtherObjectNormalizers(#[AutowireIterator(self::TAG)] iterable $otherObjectNormalizers): void
-    {
-        $this->otherObjectNormalizers = $otherObjectNormalizers;
-    }
 
     public function normalize(
         mixed $data,
@@ -90,42 +62,6 @@ abstract class AbstractObjectNormalizer implements NormalizerInterface, ModelDes
         $context = $this->getDefaultContext($context);
         $object = $this->toStandardObject($data, $format, $context);
         return $this->normalizer->normalize($object, $format, $context);
-    }
-
-    public function getDefaultContext(array $context): array
-    {
-        return [
-            HelperContextBuilder::INCLUDE_ID => true,
-            HelperContextBuilder::INCLUDE_PROPERTIES => false,
-            HelperContextBuilder::EXCLUDED_FIELDS => [],
-            HelperContextBuilder::INCLUDED_FIELD_TYPES => null,
-            HelperContextBuilder::EXCLUDED_FIELD_TYPES => [],
-            HelperContextBuilder::EMPTY_ARRAYS_AS_NULL => false,
-            HelperContextBuilder::SKIP_NULL_VALUES => false,
-            ...$this->addRequiredContext($context),
-        ];
-    }
-
-    protected function addRequiredContext(array $context): array
-    {
-        return $context;
-    }
-
-    /** A normalizer for the exact class describes it ahead of one which only supports a parent class */
-    public function supports(Model $model): bool
-    {
-        $type = $model->getTypeInfo();
-        if (!$type instanceof ObjectType) {
-            return false;
-        }
-
-        $class = $type->getClassName();
-        if ($this->supportsExactly($class)) {
-            return true;
-        }
-
-        return array_any($this->getSupportedClasses(), fn(string $supported) => is_a($class, $supported, true))
-            && !$this->anotherNormalizerSupportsExactly($class);
     }
 
     public function describe(Model $model, Schema $schema): void
@@ -146,6 +82,25 @@ abstract class AbstractObjectNormalizer implements NormalizerInterface, ModelDes
                 $property->type = 'object';
             }
         }
+    }
+
+    public function getDefaultContext(array $context): array
+    {
+        return [
+            HelperContextBuilder::INCLUDE_ID => true,
+            HelperContextBuilder::INCLUDE_PROPERTIES => false,
+            HelperContextBuilder::EXCLUDED_FIELDS => [],
+            HelperContextBuilder::INCLUDED_FIELD_TYPES => null,
+            HelperContextBuilder::EXCLUDED_FIELD_TYPES => [],
+            HelperContextBuilder::EMPTY_ARRAYS_AS_NULL => false,
+            HelperContextBuilder::SKIP_NULL_VALUES => false,
+            ...$this->addRequiredContext($context),
+        ];
+    }
+
+    protected function addRequiredContext(array $context): array
+    {
+        return $context;
     }
 
     protected function toStandardObject(mixed $data, ?string $format = null, array $context = []): stdClass
@@ -172,36 +127,12 @@ abstract class AbstractObjectNormalizer implements NormalizerInterface, ModelDes
     protected function getValue(mixed $data, string $field, ?string $format = null, array $context = [])
     {
         $language = $this->utils->get(HelperContextBuilder::LANGUAGE, $context);
-        $relationsAsIds = $this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context);
         $value = $data->get($field, $language);
-        if ($relationsAsIds) {
-            $fieldType = $this->fieldFetcher->getFieldDefinitionType($data, $field);
-            if (!in_array($fieldType, self::RELATION_FIELDS)) {
-                return $value;
-            }
-
-            $getId = fn(?ElementInterface $o) => $o?->getId();
-            $value = match ($fieldType) {
-                'manyToOneRelation', 'image' => $getId($value),
-                'manyToManyRelation', 'manyToManyObjectRelation', 'reverseObjectRelation' => array_map(
-                    $getId,
-                    $value ?? [],
-                ),
-                'hotspotimage' => $value?->getImage()?->getId(),
-                'gallery' => array_map(fn(Hotspotimage $i) => $i->getImage()?->getId(), $value?->getItems() ?? []),
-                'video' => $value?->getData() instanceof Asset ? $value->getData()->getId() : $value,
-                'advancedManyToManyRelation' => array_map(
-                    fn(ElementMetadata $metadata) => $metadata->getElement()?->getId(),
-                    $value ?? [],
-                ),
-                'advancedManyToManyObjectRelation' => array_map(
-                    fn(ObjectMetadata $metadata) => $metadata->getObject()?->getId(),
-                    $value ?? [],
-                ),
-                default => $value,
-            };
+        if (!$this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context)) {
+            return $value;
         }
-        return $value;
+
+        return $this->relationsToIds($this->fieldFetcher->getFieldDefinitionType($data, $field), $value);
     }
 
     /* @return string[] */
@@ -217,98 +148,38 @@ abstract class AbstractObjectNormalizer implements NormalizerInterface, ModelDes
         );
     }
 
-    private function anotherNormalizerSupportsExactly(string $class): bool
-    {
-        return array_any($this->otherObjectNormalizers, fn($other) => $other->supportsExactly($class));
-    }
-
-    private function supportsExactly(string $class): bool
-    {
-        return in_array($class, $this->getSupportedClasses(), true);
-    }
-
-    /** @return string[] */
-    private function getSupportedClasses(): array
-    {
-        return array_keys($this->getSupportedTypes('json'));
-    }
-
     private function describeDefinition(FieldDef $definition, Schema $property, array $context): void
     {
         $property->nullable = true;
+        $fieldType = $definition->getFieldType();
         $relationsAsIds = $context[HelperContextBuilder::RELATIONS_AS_IDS] ?? false;
 
-        // FIXME: Likely need to pull out to separate types
-        $type = $definition->getFieldType();
-        if (in_array($type, self::STRING_TYPES)) {
-            $property->type = 'string';
-        } elseif (in_array($type, ['numeric', 'slider'])) {
-            $this->describeNumber($definition, $property);
-        } elseif (in_array($type, ['checkbox', 'booleanSelect'])) {
-            $property->type = 'boolean';
-        } elseif (in_array($type, ['multiselect', 'arrayField', 'countrymultiselect', 'languagemultiselect'])) {
-            $this->describeArray($property, ['type' => 'string']);
-        } elseif (in_array($type, ['date', 'datetime'])) {
-            $this->describeDate($property, $context);
-        } elseif ($type === 'objectbricks') {
+        if ($relationsAsIds && in_array($fieldType, self::RELATION_FIELDS)) {
+            $this->describeRelationIds($fieldType, $property);
+        } elseif ($fieldType === 'objectbricks') {
             $this->describeBricks($definition, $property, $context);
-        } elseif ($type === 'manyToOneRelation') {
-            if ($relationsAsIds) {
-                $property->type = 'integer';
-            } else {
-                $this->describeRelation($definition, $property, $context);
-            }
-        } elseif (in_array($type, ['manyToManyObjectRelation', 'manyToManyRelation', 'reverseObjectRelation'])) {
-            $this->describeArray(
-                $property,
-                $relationsAsIds ? ['type' => 'integer'] : $this->getRelationSchema($definition, $property, $context),
-            );
-        } elseif (
-            in_array($type, [
-                'image',
-                'hotspotimage',
-                'video',
-                'advancedManyToManyRelation',
-                'advancedManyToManyObjectRelation',
-            ])
-        ) {
-            // FIXME: implement nested object describing
-            if ($relationsAsIds) {
-                $property->type = 'integer';
-            }
-        } elseif ($type === 'gallery') {
-            // FIXME: implement nested object describing
-            if ($relationsAsIds) {
-                $this->describeArray($property, ['type' => 'integer']);
-            }
-        }
-    }
-
-    private function describeNumber(FieldDef $definition, Schema $property)
-    {
-        $isInt = $definition instanceof FieldDef\Numeric && $definition->getInteger();
-        if ($isInt) {
-            $property->type = 'integer';
+        } elseif ($fieldType === 'fieldcollections') {
+            /** @var FieldDef\Fieldcollections $definition */
+            $this->describeFieldCollections($definition, $property, $context);
+        } elseif ($fieldType === 'block') {
+            /** @var FieldDef\Block $definition */
+            $this->describeBlock($definition, $property, $context);
+        } elseif ($fieldType === 'encryptedField') {
+            /** @var FieldDef\EncryptedField $definition */
+            $this->describeDefinition($definition->getDelegate(), $property, $context);
         } else {
-            $property->type = 'number';
+            $this->describePhpdocType($definition->getPhpdocReturnType(), $property, $context);
         }
     }
 
-    private function describeArray(Schema $property, array $items): void
+    private function describeRelationIds(string $fieldType, Schema $property): void
     {
-        $property->type = 'array';
-        $property->items = new Items([...$items, '_context' => Util::createWeakContext($property->_context)]);
-    }
-
-    private function describeDate(Schema $property, array $context): void
-    {
-        $format = $context[HelperContextBuilder::DATE_FORMAT] ?? 'ISO8601';
-        $property->type = 'string';
-        if ($format === 'ISO8601') {
-            $property->format = 'date-time';
+        if (in_array($fieldType, self::SINGLE_RELATION_FIELDS)) {
+            $property->type = 'integer';
             return;
         }
-        $property->description = "Date format: $format";
+        $property->type = 'array';
+        $property->items = new Items(['type' => 'integer', '_context' => Util::createWeakContext($property->_context)]);
     }
 
     /** @param FieldDef\Objectbricks $definition */
@@ -316,51 +187,102 @@ abstract class AbstractObjectNormalizer implements NormalizerInterface, ModelDes
     {
         $property->type = 'object';
         foreach ($definition->getAllowedTypes() as $type) {
-            $className = self::BRICK_NAMESPACE . $type;
-            Util::getProperty($property, $type)->ref = $this->register($className, $context);
+            $this->describeClass(self::BRICK_NAMESPACE . $type, Util::getProperty($property, $type), $context);
         }
     }
 
-    private function describeRelation(FieldDef $definition, Schema $property, array $context): void
+    private function describeFieldCollections(
+        FieldDef\Fieldcollections $definition,
+        Schema $property,
+        array $context,
+    ): void {
+        $property->type = 'array';
+        $property->items = new Items(['_context' => Util::createWeakContext($property->_context)]);
+        $property->items->oneOf = array_map(function (string $type) use ($property, $context) {
+            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
+            $this->describeClass(self::FIELD_COLLECTION_NAMESPACE . ucfirst($type), $schema, $context);
+            return $schema;
+        }, $definition->getAllowedTypes());
+    }
+
+    /** Each block row maps a child field name to `{data: value}`, as BlockElementNormalizer outputs it */
+    private function describeBlock(FieldDef\Block $definition, Schema $property, array $context): void
     {
-        foreach ($this->getRelationSchema($definition, $property, $context) as $key => $value) {
-            $property->$key = $value;
+        $property->type = 'array';
+        $property->items = new Items(['type' => 'object', '_context' => Util::createWeakContext($property->_context)]);
+        foreach ($definition->getFieldDefinitions() as $name => $child) {
+            $element = Util::getProperty($property->items, $name);
+            $element->type = 'object';
+            $this->describeDefinition($child, Util::getProperty($element, 'data'), $context);
         }
     }
 
-    /** Relations restricted to data object classes reference those models, anything else is a generic object */
-    private function getRelationSchema(FieldDef $definition, Schema $property, array $context): array
+    private function describePhpdocType(?string $phpdocType, Schema $property, array $context): void
     {
-        $classes = match (true) {
-            $definition instanceof FieldDef\ReverseObjectRelation => [$definition->getOwnerClassName()],
-            $definition instanceof FieldDef\ManyToManyObjectRelation => array_column(
-                $definition->getClasses(),
-                'classes',
+        if ($phpdocType !== null) {
+            $this->describeType(TypeResolver::create()->resolve($phpdocType), $property, $context);
+        }
+    }
+
+    private function describeType(Type $type, Schema $property, array $context): void
+    {
+        match (true) {
+            $type instanceof NullableType => $this->describeType($type->getWrappedType(), $property, $context),
+            $type instanceof CollectionType => $this->describeCollection($type, $property, $context),
+            $type instanceof UnionType => $this->describeUnion($type, $property, $context),
+            $type instanceof ObjectType => $this->describeClass(
+                ltrim($type->getClassName(), '\\'),
+                $property,
+                $context,
             ),
-            $definition instanceof FieldDef\ManyToOneRelation &&
-                !$definition->getAssetsAllowed() &&
-                !$definition->getDocumentsAllowed()
-                => array_column($definition->getClasses(), 'classes'),
-            default => [],
+            $type instanceof BuiltinType => $this->describeBuiltin($type, $property),
+            default => null,
         };
-        if ($classes === []) {
-            return ['type' => 'object'];
-        }
-
-        return [
-            'oneOf' => array_map(
-                fn(string $class) => new Schema([
-                    'ref' => $this->register(self::DATA_OBJECT_NAMESPACE . $class, $context),
-                    '_context' => Util::createWeakContext($property->_context),
-                ]),
-                $classes,
-            ),
-        ];
     }
 
-    private function register(string $class, array $context): string
+    private function describeCollection(CollectionType $type, Schema $property, array $context): void
     {
-        return $this->modelRegistry->register(new Model(Type::object($class), serializationContext: $context));
+        $property->type = 'array';
+        $property->items = new Items(['_context' => Util::createWeakContext($property->_context)]);
+        $this->describeType($type->getCollectionValueType(), $property->items, $context);
+    }
+
+    private function describeUnion(UnionType $type, Schema $property, array $context): void
+    {
+        $property->oneOf = array_map(function (Type $member) use ($property, $context) {
+            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
+            $this->describeType($member, $schema, $context);
+            return $schema;
+        }, $type->getTypes());
+    }
+
+    private function describeBuiltin(BuiltinType $type, Schema $property): void
+    {
+        $openApiType = match ($type->getTypeIdentifier()) {
+            TypeIdentifier::STRING => 'string',
+            TypeIdentifier::INT => 'integer',
+            TypeIdentifier::FLOAT => 'number',
+            TypeIdentifier::BOOL => 'boolean',
+            TypeIdentifier::ARRAY => 'array',
+            default => null,
+        };
+        if ($openApiType !== null) {
+            $property->type = $openApiType;
+        }
+    }
+
+    private function describeClass(string $class, Schema $property, array $context): void
+    {
+        if (is_a($class, DateTimeInterface::class, true)) {
+            $this->describeDate($property, $context);
+            return;
+        }
+        if (isset(self::SCALAR_CLASSES[$class])) {
+            $property->type = self::SCALAR_CLASSES[$class];
+            return;
+        }
+
+        $this->describeModel($class, $property, $context);
     }
 
     abstract public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool;

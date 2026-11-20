@@ -3,6 +3,9 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
+use Nelmio\ApiDocBundle\Model\Model;
+use Nelmio\ApiDocBundle\OpenApiPhp\Util;
+use OpenApi\Annotations\Schema;
 use Pimcore\Model\Asset;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
@@ -16,8 +19,10 @@ use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
 #[AsAlias('torq.normalizer.asset', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -2]])]
-class AssetNormalizer implements NormalizerInterface
+class AssetNormalizer implements DescribingNormalizerInterface
 {
+    use DescribingNormalizerTrait;
+
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
         protected ArrayUtils $utils,
@@ -42,6 +47,23 @@ class AssetNormalizer implements NormalizerInterface
         $metadata = $this->metadataRepository->getForAssetId($data->getId());
         $output->metadata = count($metadata) > 0 ? $this->convertAssetMetadataToObject($metadata) : null;
         return $this->normalizer->normalize($output, $format, $context);
+    }
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        $this->describeProperties($schema, [
+            'id' => 'integer',
+            'fullPath' => 'string',
+            'fileName' => 'string',
+            'mimeType' => 'string',
+            'fileType' => 'string',
+            'fileSize' => 'string',
+        ], nullable: false);
+
+        $metadata = Util::getProperty($schema, 'metadata');
+        $metadata->type = 'object';
+        $metadata->nullable = true;
+        $metadata->additionalProperties = true;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

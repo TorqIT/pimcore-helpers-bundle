@@ -3,16 +3,19 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
+use Nelmio\ApiDocBundle\Model\Model;
+use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\Data\InputQuantityValue;
 use Pimcore\Model\DataObject\Data\QuantityValue;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsAlias('torq.normalizer.quantity_value', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
-class QuantityValueNormalizer implements NormalizerInterface
+class QuantityValueNormalizer implements DescribingNormalizerInterface
 {
+    use DescribingNormalizerTrait;
+
     /* @param QuantityValue|InputQuantityValue $data */
     public function normalize(
         mixed $data,
@@ -24,6 +27,17 @@ class QuantityValueNormalizer implements NormalizerInterface
             'unit' => $data->getUnit()?->getAbbreviation(),
             'unitName' => $data->getUnit()?->getId()
         ];
+    }
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        $isInput = is_a($model->getTypeInfo()->getClassName(), InputQuantityValue::class, true);
+
+        $this->describeProperties($schema, [
+            'value' => $isInput ? 'string' : 'number',
+            'unit' => 'string',
+            'unitName' => 'string',
+        ]);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

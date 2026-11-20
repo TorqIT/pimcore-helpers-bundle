@@ -3,6 +3,8 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
+use Nelmio\ApiDocBundle\Model\Model;
+use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\Data\ObjectMetadata;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
@@ -12,8 +14,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsAlias('torq.normalizer.object_metadata', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
-class ObjectMetadataNormalizer implements NormalizerInterface
+class ObjectMetadataNormalizer implements DescribingNormalizerInterface
 {
+    use DescribingNormalizerTrait;
+
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface $normalizer
     ) {
@@ -31,6 +35,12 @@ class ObjectMetadataNormalizer implements NormalizerInterface
             $output->$column = $value;
         }
         return $this->normalizer->normalize($output, $format, $context);
+    }
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        $this->describeProperties($schema, ['object' => 'object'], nullable: false);
+        $schema->additionalProperties = true;
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

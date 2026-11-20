@@ -4,15 +4,19 @@ namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
 use Carbon\CarbonPeriod;
+use Nelmio\ApiDocBundle\Model\Model;
+use Nelmio\ApiDocBundle\OpenApiPhp\Util;
+use OpenApi\Annotations\Schema;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsAlias('torq.normalizer.carbon_period', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
-class CarbonPeriodNormalizer implements NormalizerInterface
+class CarbonPeriodNormalizer implements DescribingNormalizerInterface
 {
+    use DescribingNormalizerTrait;
+
     public function __construct(
         #[Autowire(service: 'torq.normalizer.carbon')] private CarbonNormalizer $carbonNormalizer,
     )
@@ -30,6 +34,14 @@ class CarbonPeriodNormalizer implements NormalizerInterface
             'endDate' => $this->carbonNormalizer->normalize($data->getEndDate(), $format, $context),
         ];
     } 
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        $schema->type = 'object';
+        foreach (['startDate', 'endDate'] as $name) {
+            $this->describeDate(Util::getProperty($schema, $name), $model->getSerializationContext());
+        }
+    }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {

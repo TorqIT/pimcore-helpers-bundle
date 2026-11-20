@@ -3,15 +3,18 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
+use Nelmio\ApiDocBundle\Model\Model;
+use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\Data\QuantityValueRange;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsAlias('torq.normalizer.quantity_value_range', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
-class QuantityValueRangeNormalizer implements NormalizerInterface
+class QuantityValueRangeNormalizer implements DescribingNormalizerInterface
 {
+    use DescribingNormalizerTrait;
+
     /* @param QuantityValueRange $data */
     public function normalize(
         mixed $data,
@@ -24,6 +27,16 @@ class QuantityValueRangeNormalizer implements NormalizerInterface
             'unit' => $data->getUnit()?->getAbbreviation(),
             'unitName' => $data->getUnit()?->getId()
         ];
+    }
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        $this->describeProperties($schema, [
+            'minimum' => 'number',
+            'maximum' => 'number',
+            'unit' => 'string',
+            'unitName' => 'string',
+        ]);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
