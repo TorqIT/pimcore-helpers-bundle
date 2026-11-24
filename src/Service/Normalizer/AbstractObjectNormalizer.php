@@ -8,6 +8,8 @@ use Nelmio\ApiDocBundle\Model\Model;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use OpenApi\Annotations\Items;
 use OpenApi\Annotations\Schema;
+use Pimcore\Model\Asset;
+use Pimcore\Model\DataObject\ClassDefinition;
 use Pimcore\Model\DataObject\ClassDefinition\Data as FieldDef;
 use Pimcore\Model\DataObject\Data\Consent;
 use Pimcore\Model\DataObject\Data\ExternalImage;
@@ -34,6 +36,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
     use DescribingNormalizerTrait;
     use RelationsAsIdsTrait;
 
+    private const string DATA_OBJECT_NAMESPACE = 'Pimcore\\Model\\DataObject\\';
     private const string BRICK_NAMESPACE = 'Pimcore\\Model\\DataObject\\Objectbrick\\Data\\';
     private const string FIELD_COLLECTION_NAMESPACE = 'Pimcore\\Model\\DataObject\\Fieldcollection\\Data\\';
 
@@ -165,6 +168,12 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         } elseif ($fieldType === 'block') {
             /** @var FieldDef\Block $definition */
             $this->describeBlock($definition, $property, $context);
+        } elseif ($fieldType === 'advancedManyToManyObjectRelation') {
+            /** @var FieldDef\AdvancedManyToManyObjectRelation $definition */
+            $this->describeAdvancedObjectRelation($definition, $property, $context);
+        } elseif ($fieldType === 'advancedManyToManyRelation') {
+            /** @var FieldDef\AdvancedManyToManyRelation $definition */
+            $this->describeAdvancedRelation($definition, $property, $context);
         } elseif ($fieldType === 'encryptedField') {
             /** @var FieldDef\EncryptedField $definition */
             $this->describeDefinition($definition->getDelegate(), $property, $context);
@@ -196,13 +205,14 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         Schema $property,
         array $context,
     ): void {
+        $classes = array_map(
+            fn(string $type) => self::FIELD_COLLECTION_NAMESPACE . ucfirst($type),
+            $definition->getAllowedTypes(),
+        );
+
         $property->type = 'array';
         $property->items = new Items(['_context' => Util::createWeakContext($property->_context)]);
-        $property->items->oneOf = array_map(function (string $type) use ($property, $context) {
-            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
-            $this->describeClass(self::FIELD_COLLECTION_NAMESPACE . ucfirst($type), $schema, $context);
-            return $schema;
-        }, $definition->getAllowedTypes());
+        $this->describeClasses($classes, $property->items, $context);
     }
 
     /** Each block row maps a child field name to `{data: value}`, as BlockElementNormalizer outputs it */
@@ -215,6 +225,91 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
             $element->type = 'object';
             $this->describeDefinition($child, Util::getProperty($element, 'data'), $context);
         }
+    }
+
+    private function describeAdvancedObjectRelation(
+        FieldDef\AdvancedManyToManyObjectRelation $definition,
+        Schema $property,
+        array $context,
+    ): void {
+        $className = ClassDefinition::getById($definition->getAllowedClassId())->getName();
+        $classes = [self::DATA_OBJECT_NAMESPACE . ucfirst($className)];
+
+        $this->describeMetadataRows($property, 'object', $classes, $definition->getColumns(), $context);
+    }
+
+    private function describeAdvancedRelation(
+        FieldDef\AdvancedManyToManyRelation $definition,
+        Schema $property,
+        array $context,
+    ): void {
+        $classes = $this->getAllowedElementClasses($definition);
+
+        $this->describeMetadataRows($property, 'element', $classes, $definition->getColumns(), $context);
+    }
+
+    /** @return string[] empty when the allowed elements can't be narrowed to classes a normalizer describes */
+    private function getAllowedElementClasses(FieldDef\AdvancedManyToManyRelation $definition): array
+    {
+        $anyObjectAllowed = $definition->getObjectsAllowed() && $definition->getClasses() === [];
+        if ($definition->getDocumentsAllowed() || $anyObjectAllowed) {
+            return [];
+        }
+
+        $classes = [];
+        if ($definition->getObjectsAllowed()) {
+            $classes = array_map(
+                fn(array $class) => self::DATA_OBJECT_NAMESPACE . ucfirst($class['classes']),
+                $definition->getClasses(),
+            );
+        }
+        if ($definition->getAssetsAllowed()) {
+            $classes[] = Asset::class;
+        }
+        return $classes;
+    }
+
+    /**
+     * Each row is the related element plus its metadata columns, as the metadata normalizers output it.
+     * Pimcore stores every column value as text, whatever the column's type.
+     *
+     * @param string[] $classes
+     * @param array<array{key: string}> $columns
+     */
+    private function describeMetadataRows(
+        Schema $property,
+        string $elementKey,
+        array $classes,
+        array $columns,
+        array $context,
+    ): void {
+        $property->type = 'array';
+        $property->items = new Items(['type' => 'object', '_context' => Util::createWeakContext($property->_context)]);
+        $this->describeClasses($classes, Util::getProperty($property->items, $elementKey), $context);
+        foreach ($columns as $column) {
+            $value = Util::getProperty($property->items, $column['key']);
+            $value->type = 'string';
+            $value->nullable = true;
+        }
+    }
+
+    /** @param string[] $classes */
+    private function describeClasses(array $classes, Schema $property, array $context): void
+    {
+        if ($classes === []) {
+            $property->type = 'object';
+            return;
+        }
+        if (count($classes) === 1) {
+            $this->describeClass($classes[0], $property, $context);
+            return;
+        }
+
+        $property->oneOf = array_map(function (string $class) use ($property, $context) {
+            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
+            $this->describeClass($class, $schema, $context);
+            return $schema;
+        }, $classes);
     }
 
     private function describePhpdocType(?string $phpdocType, Schema $property, array $context): void

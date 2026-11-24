@@ -114,7 +114,7 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public function addExcludedField(string $field)
     {
         $existingExclusion = $this->toArray()[self::EXCLUDED_FIELDS] ?? [];
-        return $this->with(self::EXCLUDED_FIELDS, [...$existingExclusion, $field]);
+        return $this->with(self::EXCLUDED_FIELDS, array_unique([...$existingExclusion, $field]));
     }
 
     /** @param string[] $includedFieldTypes */
@@ -126,7 +126,7 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public function addIncludedFieldType(string $type)
     {
         $existingInclusions = $this->toArray()[self::INCLUDED_FIELD_TYPES] ?? [];
-        return $this->with(self::INCLUDED_FIELD_TYPES, [...$existingInclusions, $type]);
+        return $this->with(self::INCLUDED_FIELD_TYPES, array_unique([...$existingInclusions, $type]));
     }
 
     /** @param string[] $excludedFieldTypes */
@@ -138,7 +138,7 @@ final class HelperContextBuilder extends AbstractNormalizerContextBuilder
     public function addExcludedFieldType(string $type)
     {
         $existingExclusions = $this->toArray()[self::EXCLUDED_FIELD_TYPES] ?? [];
-        return $this->with(self::EXCLUDED_FIELD_TYPES, [...$existingExclusions, $type]);
+        return $this->with(self::EXCLUDED_FIELD_TYPES, array_unique([...$existingExclusions, $type]));
     }
 
     public function relationsAsIds(bool $relationsAsIds = true)
