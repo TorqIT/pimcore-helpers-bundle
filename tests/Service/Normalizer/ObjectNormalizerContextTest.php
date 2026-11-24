@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Torq\PimcoreHelpersBundle\Tests\Service\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Pimcore\Model\DataObject\Concrete;
+use Pimcore\Model\DataObject\Listing;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
@@ -80,6 +82,93 @@ class ObjectNormalizerContextTest extends TestCase
         $resolved = $normalizer->getDefaultContext([]);
 
         $this->assertSame($resolved, $normalizer->getDefaultContext($resolved));
+    }
+
+    public function testNestedNormalizersReceiveThePassedAndRequiredContextButNotTheDefaults()
+    {
+        $passedDown = null;
+        $objectNormalizer = $this->createStub(NormalizerInterface::class);
+        $objectNormalizer->method('normalize')->willReturnCallback(
+            function (mixed $data, ?string $format, array $context) use (&$passedDown) {
+                $passedDown = $context;
+                return [];
+            },
+        );
+        $normalizer = new class (
+            $objectNormalizer,
+            new ArrayUtils(),
+            $this->createConfiguredStub(FieldFetcher::class, ['getFields' => []]),
+            $this->describer,
+        ) extends DataObjectNormalizer {
+            protected function addRequiredContext(array $context): array
+            {
+                return HelperContextBuilder::create()->withContext($context)->relationsAsIds()->toArray();
+            }
+        };
+        $passed = HelperContextBuilder::create()->withLanguage('en')->toArray();
+
+        $normalizer->normalize($this->createStub(Concrete::class), 'json', $passed);
+
+        $this->assertSame(
+            [HelperContextBuilder::LANGUAGE => 'en', HelperContextBuilder::RELATIONS_AS_IDS => true],
+            $passedDown,
+        );
+    }
+
+    public function testSubclassCallingToStandardObjectWithItsOwnContextStillGetsTheDefaults()
+    {
+        $requested = null;
+        $fieldFetcher = $this->createStub(FieldFetcher::class);
+        $fieldFetcher->method('getFields')->willReturnCallback(
+            function (object $object, bool $includeId, bool $includeProperties, array $excludedFields) use (
+                &$requested,
+            ) {
+                $requested = compact('includeId', 'includeProperties', 'excludedFields');
+                return [];
+            },
+        );
+        $normalizer = new class (
+            $this->createStub(NormalizerInterface::class),
+            new ArrayUtils(),
+            $fieldFetcher,
+            $this->describer,
+        ) extends DataObjectNormalizer {
+            public function normalize(mixed $data, ?string $format = null, array $context = []): array
+            {
+                $ownContext = HelperContextBuilder::create()->excludeFields(['secret'])->toArray();
+
+                return (array) $this->toStandardObject($data, $format, $ownContext);
+            }
+        };
+
+        $normalizer->normalize($this->createStub(Concrete::class), 'json');
+
+        $this->assertTrue($requested['includeId']);
+        $this->assertFalse($requested['includeProperties']);
+        $this->assertSame(['secret'], $requested['excludedFields']);
+    }
+
+    public function testRequiredContextReachesTheWholeNormalizer()
+    {
+        $objectNormalizer = $this->createStub(NormalizerInterface::class);
+        $objectNormalizer->method('normalize')->willReturnCallback(fn(object $output) => (array) $output);
+        $normalizer = new class (
+            $objectNormalizer,
+            new ArrayUtils(),
+            $this->createConfiguredStub(FieldFetcher::class, ['getFields' => []]),
+            $this->describer,
+        ) extends DataObjectNormalizer {
+            protected function addRequiredContext(array $context): array
+            {
+                return HelperContextBuilder::create()->withContext($context)->includeChildren()->toArray();
+            }
+        };
+        $children = $this->createConfiguredStub(Listing::class, ['getData' => []]);
+        $object = $this->createConfiguredStub(Concrete::class, ['getChildren' => $children]);
+
+        $normalized = $normalizer->normalize($object, 'json');
+
+        $this->assertArrayHasKey('children', $normalized);
     }
 
     private function createNormalizer(): DataObjectNormalizer

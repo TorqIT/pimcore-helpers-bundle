@@ -89,6 +89,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
 
     protected function toStandardObject(mixed $data, ?string $format = null, array $context = []): stdClass
     {
+        $context = $this->getDefaultContext($context);
         $castEmptyArrayToNull = $this->utils->get(HelperContextBuilder::EMPTY_ARRAYS_AS_NULL, $context, false);
         $skipNullValues = $this->utils->get(HelperContextBuilder::SKIP_NULL_VALUES, $context, false);
 

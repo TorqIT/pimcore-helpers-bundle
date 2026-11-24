@@ -9,10 +9,10 @@ Adds OpenAPI model describers to the normalizers. This is a breaking change for 
 * `nelmio/api-doc-bundle` and `symfony/type-info` are now required.
 * `AbstractObjectNormalizer` and `AssetNormalizer` take a `PimcoreModelDescriber` as their last constructor argument.
   A subclass which defines its own constructor has to accept it and pass it to the parent.
+  Until it does, the API documentation and the console fail as well as normalization, because Nelmio constructs
+  every describing normalizer.
 * `AbstractObjectNormalizer::getFields()` is private. To change which fields are normalized, override
   `addRequiredContext()` instead.
-* Context defaults are applied in `getDefaultContext()`. A subclass which overrides `normalize()` and calls
-  `toStandardObject()` itself has to pass its context through `getDefaultContext()` first.
 * The remaining normalizers which now describe their output also take a `PimcoreModelDescriber`. This only matters
   if you construct them by hand: `CarbonPeriodNormalizer`, `ElementMetadataNormalizer`, `HotspotImageNormalizer`,
   `ImageGalleryNormalizer`, `ListingNormalizer`, `NumericRangeNormalizer`, `ObjectMetadataNormalizer`,
