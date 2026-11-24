@@ -20,6 +20,8 @@ trait DescriberTestTrait
 {
     private ArrayObject $normalizers;
     private PimcoreModelDescriber $describer;
+    private OpenApi $api;
+    private ModelRegistry $registry;
 
     private function createDescriber(): void
     {
@@ -34,9 +36,9 @@ trait DescriberTestTrait
             $this->normalizers->append($normalizer);
         }
 
-        $api = new OpenApi(['_context' => new Context()]);
-        $registry = new ModelRegistry([$this->describer, ...$this->normalizers], $api);
-        $this->describer->setModelRegistry($registry);
+        $this->api = new OpenApi(['_context' => new Context()]);
+        $this->registry = new ModelRegistry([$this->describer, ...$this->normalizers], $this->api);
+        $this->describer->setModelRegistry($this->registry);
     }
 
     private function modelOf(string $class, array $context = []): Model
@@ -47,6 +49,14 @@ trait DescriberTestTrait
     private function newSchema(): Schema
     {
         return new Schema(['_context' => new Context()]);
+    }
+
+    /** @return array<string, array> every model referenced so far, by schema name */
+    private function getReferencedSchemas(): array
+    {
+        $this->registry->registerSchemas();
+
+        return json_decode($this->api->toJson(), true)['components']['schemas'];
     }
 
     private function describe(DescribingNormalizerInterface $normalizer, string $class, array $context = []): array

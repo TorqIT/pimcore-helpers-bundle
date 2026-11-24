@@ -7,27 +7,23 @@ namespace Torq\PimcoreHelpersBundle\Tests\Service\Normalizer;
 use PHPUnit\Framework\TestCase;
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\ClassDefinition\Data as FieldDef;
-use Pimcore\Model\DataObject\Concrete;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Model\DataObject\ClassDefinition\Data\ArrayField;
 use Torq\PimcoreHelpersBundle\Repository\AssetMetadataRepository;
-use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\AssetNormalizer;
-use Torq\PimcoreHelpersBundle\Service\Normalizer\DataObjectNormalizer;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\FieldCollectionDataNormalizer;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\ObjectBrickDataNormalizer;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\VideoNormalizer;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
-use Torq\PimcoreHelpersBundle\Tests\Support\DescriberTestTrait;
 use Torq\PimcoreHelpersBundle\Tests\Support\FixtureBrick;
 use Torq\PimcoreHelpersBundle\Tests\Support\FixtureFieldCollection;
+use Torq\PimcoreHelpersBundle\Tests\Support\ObjectDescriptionTestTrait;
 
-/** Describes objects whose fields come from a stubbed FieldFetcher, so no class definitions are needed */
 class ObjectNormalizerDescriptionTest extends TestCase
 {
-    use DescriberTestTrait;
+    use ObjectDescriptionTestTrait;
 
     private const string BRICK_NAMESPACE = 'Pimcore\\Model\\DataObject\\Objectbrick\\Data\\';
     private const string FIELD_COLLECTION_NAMESPACE = 'Pimcore\\Model\\DataObject\\Fieldcollection\\Data\\';
@@ -37,7 +33,6 @@ class ObjectNormalizerDescriptionTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        // Pimcore generates these classes per project; the describer only ever builds their names
         self::aliasOnce(FixtureBrick::class, self::BRICK_NAMESPACE . 'FixtureBrick');
         self::aliasOnce(FixtureFieldCollection::class, self::FIELD_COLLECTION_NAMESPACE . 'FixtureFieldCollection');
         self::aliasOnce(FixtureFieldCollection::class, self::FIELD_COLLECTION_NAMESPACE . 'OtherFieldCollection');
@@ -245,36 +240,6 @@ class ObjectNormalizerDescriptionTest extends TestCase
         $this->assertSame(['type' => 'object'], $children['items']);
     }
 
-    /**
-     * @param array<string, FieldDef|null> $definitions field definitions by field name, null for a field without one
-     * @return array<string, array> the described properties by field name
-     */
-    private function describeFields(array $definitions, array $context = []): array
-    {
-        $normalizer = new DataObjectNormalizer(
-            $this->createStub(NormalizerInterface::class),
-            new ArrayUtils(),
-            $this->createFieldFetcher($definitions),
-            $this->describer,
-        );
-        $this->registerNormalizers($normalizer);
-
-        return $this->describe($normalizer, Concrete::class, $context)['properties'];
-    }
-
-    /** @param array<string, FieldDef|null> $definitions */
-    private function createFieldFetcher(array $definitions): FieldFetcher
-    {
-        $fieldFetcher = $this->createStub(FieldFetcher::class);
-        $fieldFetcher->method('toObject')->willReturn($this->createStub(Concrete::class));
-        $fieldFetcher->method('getFields')->willReturn(array_keys($definitions));
-        $fieldFetcher->method('getFieldDefinition')->willReturnCallback(
-            fn(object $object, string $field) => $definitions[$field],
-        );
-
-        return $fieldFetcher;
-    }
-
     private function registerFieldCollectionNormalizer(): void
     {
         $this->registerNormalizers(new FieldCollectionDataNormalizer(
@@ -290,12 +255,5 @@ class ObjectNormalizerDescriptionTest extends TestCase
         $definition->setName($name);
 
         return $definition;
-    }
-
-    private static function aliasOnce(string $class, string $alias): void
-    {
-        if (!class_exists($alias, false)) {
-            class_alias($class, $alias);
-        }
     }
 }
