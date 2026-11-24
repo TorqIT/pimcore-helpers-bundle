@@ -2,6 +2,10 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
+use Nelmio\ApiDocBundle\Model\Model;
+use Nelmio\ApiDocBundle\OpenApiPhp\Util;
+use OpenApi\Annotations\Items;
+use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Concrete as DataObject;
 use stdClass;
@@ -62,6 +66,32 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         }
 
         return $object;
+    }
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        parent::describe($model, $schema);
+
+        $context = $this->getDefaultContext($model->getSerializationContext());
+        if (!$context[HelperContextBuilder::INCLUDE_CHILDREN]) {
+            return;
+        }
+
+        $children = Util::getProperty($schema, 'children');
+        $children->type = 'array';
+        $children->nullable = true;
+        $children->items = new Items(['_context' => Util::createWeakContext($children->_context)]);
+        if ($context[HelperContextBuilder::CHILD_TYPES] !== [AbstractObject::OBJECT_TYPE_VARIANT]) {
+            $children->items->type = 'object';
+            return;
+        }
+
+        // Variants share their parent's class, so they reference this same model
+        $this->describeModel(
+            $model->getTypeInfo()->getClassName(),
+            $children->items,
+            $model->getSerializationContext(),
+        );
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

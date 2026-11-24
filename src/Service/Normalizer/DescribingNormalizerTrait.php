@@ -46,7 +46,7 @@ trait DescribingNormalizerTrait
     public function supports(Model $model): bool
     {
         $type = $model->getTypeInfo();
-        if (!$type instanceof ObjectType) {
+        if (!($type instanceof ObjectType)) {
             return false;
         }
 
@@ -56,8 +56,8 @@ trait DescribingNormalizerTrait
             return true;
         }
 
-        return array_any($supportedClasses, fn(string $supported) => is_a($class, $supported, true))
-            && !$this->anotherNormalizerSupportsExactly($class);
+        return array_any($supportedClasses, fn(string $supported) => is_a($class, $supported, true)) &&
+            !$this->anotherNormalizerSupportsExactly($class);
     }
 
     /** @param array<string, string> $types OpenAPI types by property name */
@@ -84,8 +84,8 @@ trait DescribingNormalizerTrait
         $property->description = "Date format: $format";
     }
 
-    /** References the model of a class, or falls back to a generic object when no normalizer describes it */
-    private function describeModel(string $class, Schema $property, array $context): void
+    /** References the model of a class, or falls back to a generic object when no normalizer describes it. */
+    protected function describeModel(string $class, Schema $property, array $context): void
     {
         $shapeContext = array_intersect_key($context, array_flip(self::SHAPE_KEYS));
         $model = new Model(Type::object($class), serializationContext: $shapeContext);
