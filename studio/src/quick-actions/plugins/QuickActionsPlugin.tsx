@@ -1,7 +1,7 @@
 import { container, type IAbstractPlugin } from "@pimcore/studio-ui-bundle";
 import { serviceIds } from "@pimcore/studio-ui-bundle/app";
 import { componentConfig, type ComponentRegistry } from "@pimcore/studio-ui-bundle/modules/app";
-import { QuickActions } from "../components/QuickActions";
+import { QUICK_ACTIONS_SIDEBAR_BUTTON_NAME, QuickActionsSidebarButton } from "../components/QuickActionsSidebarButton";
 import { QUICK_ACTION_REGISTRY_SERVICE_ID, QuickActionRegistry } from "../dynamic-types/QuickActionRegistry";
 import { NATIVE_REINDEX_SERVICE_ID, NativeReindexAction } from "../dynamic-types/NativeReindexAction";
 import {
@@ -33,8 +33,8 @@ export const QuickActionsPlugin: IAbstractPlugin = {
                 );
 
                 componentRegistry.registerToSlot(componentConfig.leftSidebar.slot.name, {
-                    name: "quickActionsMenu",
-                    component: QuickActions,
+                    name: QUICK_ACTIONS_SIDEBAR_BUTTON_NAME,
+                    component: QuickActionsSidebarButton,
                     priority: 101,
                 });
             },
