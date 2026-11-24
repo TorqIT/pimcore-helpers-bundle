@@ -3,20 +3,27 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
+use Nelmio\ApiDocBundle\Model\Model;
+use Nelmio\ApiDocBundle\OpenApiPhp\Util;
+use OpenApi\Annotations\Items;
+use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\Listing\Concrete as Listing;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.listing', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
-class ListingNormalizer implements NormalizerInterface
+class ListingNormalizer implements DescribingNormalizerInterface
 {
+    use PimcoreModelSupportTrait;
+
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface $normalizer,
+        protected PimcoreModelDescriber $describer,
     ) {
     }
 
@@ -31,6 +38,30 @@ class ListingNormalizer implements NormalizerInterface
         $output->pageTotal = $data->getCount();
         $output->total = $data->getTotalCount();
         return $this->normalizer->normalize($output, $format, $context);
+    }
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        $this->describer->describeObject(
+            ['pageTotal' => 'integer', 'total' => 'integer'],
+            $schema,
+            nullable: false,
+        );
+
+        $data = Util::getProperty($schema, 'data');
+        $data->type = 'array';
+        $data->items = new Items(['_context' => Util::createWeakContext($data->_context)]);
+        $this->describer->describeClass(
+            $this->getItemClass($model->getTypeInfo()->getClassName()),
+            $data->items,
+            $model->getSerializationContext(),
+        );
+    }
+
+    /** Pimcore generates each listing as `<Class>\Listing`, so its namespace is the class it lists */
+    private function getItemClass(string $listingClass): string
+    {
+        return substr($listingClass, 0, strrpos($listingClass, '\\'));
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = null): bool

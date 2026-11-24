@@ -36,12 +36,12 @@ class FieldFetcher
         $fields = $this->getFieldsFromFieldConsts($object::class);
         $fields = array_filter($fields, fn(string $f) => !in_array($f, $excludedFields));
         if ($includedFieldTypes !== null) {
-            $fields = array_filter($fields, function(string $f) use ($object, $includedFieldTypes) {
+            $fields = array_filter($fields, function (string $f) use ($object, $includedFieldTypes) {
                 $type = $this->getFieldDefinitionType($object, $f);
                 return in_array($type, $includedFieldTypes);
             });
         } elseif ($excludedFieldTypes) {
-            $fields = array_filter($fields, function(string $f) use ($object, $excludedFieldTypes) {
+            $fields = array_filter($fields, function (string $f) use ($object, $excludedFieldTypes) {
                 $type = $this->getFieldDefinitionType($object, $f);
                 return !in_array($type, $excludedFieldTypes);
             });
@@ -91,13 +91,16 @@ class FieldFetcher
         if ($indexType->isQuery() ? $definition->getIndex() : $definition->getUnique()) {
             return true;
         }
-        if (!$object instanceof DataObject) {
+        if (!($object instanceof DataObject)) {
             return false;
         }
 
         $columns = $this->getColumnNames($definition, $indexType->isQuery());
         foreach ($object->getClass()->getCompositeIndices() as $index) {
-            if ($index['index_type'] === $indexType->value && array_intersect($columns, $index['index_columns']) !== []) {
+            if (
+                $index['index_type'] === $indexType->value &&
+                array_intersect($columns, $index['index_columns']) !== []
+            ) {
                 return true;
             }
         }
@@ -147,12 +150,12 @@ class FieldFetcher
         return $this->getFieldDefinition($object, $field)?->getFieldType();
     }
 
-    private function toObject(DataObject|FCData|BrickData|string $object): DataObject|FCData|BrickData
+    public function toObject(DataObject|FCData|BrickData|string $object): DataObject|FCData|BrickData
     {
         if (is_string($object)) {
-            $object = new $object;
-            if (!$object instanceof DataObject && !$object instanceof FCData && !$object instanceof BrickData) {
-                throw new InvalidArgumentException("Unsupported class for object: " . $object::class);
+            $object = (new ReflectionClass($object))->newInstanceWithoutConstructor();
+            if (!($object instanceof DataObject) && !($object instanceof FCData) && !($object instanceof BrickData)) {
+                throw new InvalidArgumentException('Unsupported class for object: ' . $object::class);
             }
         }
         return $object;
@@ -160,19 +163,23 @@ class FieldFetcher
 
     private function getLocalizedFieldDefinition(DataObject|FCData|BrickData $object, string $field): ?FieldDef
     {
-        if (!$object instanceof DataObject) {
+        if (!($object instanceof DataObject)) {
             return null;
         }
         $localizedFields = $object->getClass()->getFieldDefinition('localizedfields');
-        return $localizedFields instanceof FieldDef\Localizedfields ? $localizedFields->getFieldDefinition($field) : null;
+        return $localizedFields instanceof FieldDef\Localizedfields
+            ? $localizedFields->getFieldDefinition($field)
+            : null;
     }
 
     /** @return string[] */
     private function getColumnNames(FieldDef $definition, bool $query): array
     {
         $type = match (true) {
-            $query && $definition instanceof FieldDef\QueryResourcePersistenceAwareInterface => $definition->getQueryColumnType(),
-            !$query && $definition instanceof FieldDef\ResourcePersistenceAwareInterface => $definition->getColumnType(),
+            $query && $definition instanceof FieldDef\QueryResourcePersistenceAwareInterface
+                => $definition->getQueryColumnType(),
+            !$query && $definition instanceof FieldDef\ResourcePersistenceAwareInterface
+                => $definition->getColumnType(),
             default => null,
         };
         if ($type === null) {

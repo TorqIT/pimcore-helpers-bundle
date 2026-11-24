@@ -2,7 +2,10 @@
 
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
-
+use Nelmio\ApiDocBundle\Model\Model;
+use Nelmio\ApiDocBundle\OpenApiPhp\Util;
+use OpenApi\Annotations\Items;
+use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Concrete as DataObject;
 use stdClass;
@@ -19,6 +22,24 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         AbstractObject::OBJECT_TYPE_VARIANT,
         AbstractObject::OBJECT_TYPE_FOLDER,
     ];
+
+    public function getDefaultContext(array $context): array
+    {
+        $context = [
+            HelperContextBuilder::INHERIT_VALUES => true,
+            HelperContextBuilder::INCLUDE_CHILDREN => false,
+            HelperContextBuilder::CHILD_TYPES => self::DEFAULT_CHILD_TYPES,
+            ...parent::getDefaultContext($context),
+        ];
+        if ($this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context)) {
+            return $context;
+        }
+
+        return HelperContextBuilder::create()
+            ->withContext($context)
+            ->addExcludedFieldType('reverseObjectRelation')
+            ->toArray();
+    }
 
     /** @param DataObject $data */
     protected function toStandardObject(mixed $data, ?string $format = null, array $context = []): stdClass
@@ -47,15 +68,30 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         return $object;
     }
 
-    protected function getFields(object $data, ?string $format = null, array $context = []): array
+    public function describe(Model $model, Schema $schema): void
     {
-        $relationsAsIds = $this->utils->get(HelperContextBuilder::RELATIONS_AS_IDS, $context);
-        if (!$relationsAsIds) {
-            $context = HelperContextBuilder::create()->withContext($context);
-            $context = $context->addExcludedFieldType('reverseObjectRelation');
-            $context = $context->toArray();
+        parent::describe($model, $schema);
+
+        $context = $this->getDefaultContext($model->getSerializationContext());
+        if (!$context[HelperContextBuilder::INCLUDE_CHILDREN]) {
+            return;
         }
-        return parent::getFields($data, context: $context);
+
+        $children = Util::getProperty($schema, 'children');
+        $children->type = 'array';
+        $children->nullable = true;
+        $children->items = new Items(['_context' => Util::createWeakContext($children->_context)]);
+        if ($context[HelperContextBuilder::CHILD_TYPES] !== [AbstractObject::OBJECT_TYPE_VARIANT]) {
+            $children->items->type = 'object';
+            return;
+        }
+
+        // Variants share their parent's class, so they reference this same model
+        $this->describer->describeClass(
+            $model->getTypeInfo()->getClassName(),
+            $children->items,
+            $model->getSerializationContext(),
+        );
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

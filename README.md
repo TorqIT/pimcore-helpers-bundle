@@ -2,6 +2,8 @@
 
 A collection of helpful services, utilities, and extensions for Pimcore.
 
+See the [changelog](CHANGELOG.md) for breaking changes between versions.
+
 ## Installation
 
 1. Install the composer package:
@@ -32,6 +34,75 @@ benefits to this pattern:
 
 A full set of Symfony normalizers for Pimcore's unique object types including data objects, asset, field collections,
 object bricks, blocks, classification stores, etc.
+
+### OpenAPI model describers
+
+The normalizers also describe the shape of what they output, so an endpoint can document a data object without a
+hand-written model. This needs `NelmioApiDocBundle` to be registered in the project.
+
+Reference the class as a model:
+
+```php
+#[OA\Response(response: 200, content: new OA\JsonContent(ref: new Model(type: Product::class)))]
+```
+
+The schema is built by the same normalizer which serializes that class, using the same context. To shape both the
+output and its schema, extend a normalizer and set the context it always applies:
+
+```php
+#[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
+class ProductNormalizer extends DataObjectNormalizer
+{
+    protected function addRequiredContext(array $context): array
+    {
+        return HelperContextBuilder::create()
+            ->withContext($context)
+            ->excludeFields(['internalNotes'])
+            ->relationsAsIds()
+            ->toArray();
+    }
+
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+    {
+        return $data instanceof Product;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [Product::class => true];
+    }
+}
+```
+
+A normalizer for the exact class is used ahead of one for a parent class, so `ProductNormalizer` describes `Product`
+and `DataObjectNormalizer` describes every other data object.
+
+What gets described:
+
+* Fields, from their class definition: scalars, dates, relations, object bricks, field collections and blocks.
+* Relations as IDs when the context sets `relationsAsIds()`, and otherwise as a reference to the related class.
+* Assets, quantity values, ranges, videos, galleries and listings.
+* Classification stores, element properties and asset metadata are described as a generic object, because their
+  shape lives in the database.
+
+To describe a value class of your own, implement `DescribingNormalizerInterface` on its normalizer, use
+`PimcoreModelSupportTrait`, and inject `PimcoreModelDescriber` for anything the normalizer doesn't describe itself:
+
+```php
+class PriceNormalizer implements DescribingNormalizerInterface
+{
+    use PimcoreModelSupportTrait;
+
+    public function __construct(protected PimcoreModelDescriber $describer) {}
+
+    public function describe(Model $model, Schema $schema): void
+    {
+        $this->describer->describeObject(['amount' => 'number', 'currency' => 'string'], $schema);
+    }
+
+    // normalize(), supportsNormalization() and getSupportedTypes() as usual
+}
+```
 
 ## Startup Commands
 
@@ -117,6 +188,20 @@ export const CustomQuickActionPlugin: IAbstractPlugin = {
 The Quick Actions modal is opened from a button in the left sidebar by default. `useQuickActionsModal()` returns
 `open` and `close` callbacks which work from any Studio component, so the modal can be opened from a different entry
 point.
+
+## Testing
+
+The bundle has no kernel of its own, so its tests run from a host Pimcore project which autoloads
+`Torq\PimcoreHelpersBundle\Tests\` from the bundle's `tests/` directory. Run them inside the host's PHP container,
+using the host's PHPUnit bootstraps:
+
+```shell
+# Unit tests
+vendor/bin/phpunit --bootstrap=tests/bootstrap.php --exclude-filter Functional <path-to-bundle>/tests
+
+# Tests which need a kernel
+KERNEL_CLASS='App\Kernel' vendor/bin/phpunit --bootstrap=tests/Functional/bootstrap.php <path-to-bundle>/tests/Functional
+```
 
 # License
 

@@ -287,12 +287,12 @@ class ArrayField extends Data implements
 
     public function getPhpdocInputType(): ?string
     {
-        return 'array|null';
+        return 'string[]|null';
     }
 
     public function getPhpdocReturnType(): ?string
     {
-        return 'array|null';
+        return 'string[]|null';
     }
 
     public function getFieldType(): string
