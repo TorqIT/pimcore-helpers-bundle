@@ -53,14 +53,14 @@ class AssetNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describer->describeObject($schema, [
+        $this->describer->describeObject([
             'id' => 'integer',
             'fullPath' => 'string',
             'fileName' => 'string',
             'mimeType' => 'string',
             'fileType' => 'string',
             'fileSize' => 'string',
-        ], nullable: false);
+        ], $schema, nullable: false);
 
         $metadata = Util::getProperty($schema, 'metadata');
         $metadata->type = 'object';

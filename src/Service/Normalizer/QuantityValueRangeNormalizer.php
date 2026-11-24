@@ -36,12 +36,12 @@ class QuantityValueRangeNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describer->describeObject($schema, [
+        $this->describer->describeObject([
             'minimum' => 'number',
             'maximum' => 'number',
             'unit' => 'string',
             'unitName' => 'string',
-        ]);
+        ], $schema);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

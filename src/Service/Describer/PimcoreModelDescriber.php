@@ -92,70 +92,70 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
             !$this->isSupportedExactly($class);
     }
 
-    public function describeType(Type $type, Schema $property, array $context): void
+    public function describeType(Type $type, Schema $schema, array $context): void
     {
         if ($type instanceof NullableType) {
-            $this->describeType($type->getWrappedType(), $property, $context);
+            $this->describeType($type->getWrappedType(), $schema, $context);
         } elseif ($type instanceof CollectionType) {
-            $this->describeCollection($type, $property, $context);
+            $this->describeCollection($type, $schema, $context);
         } elseif ($type instanceof UnionType) {
-            $this->describeUnion($type, $property, $context);
+            $this->describeUnion($type, $schema, $context);
         } elseif ($type instanceof ObjectType) {
-            $this->describeClass(ltrim($type->getClassName(), '\\'), $property, $context);
+            $this->describeClass(ltrim($type->getClassName(), '\\'), $schema, $context);
         } elseif ($type instanceof BuiltinType) {
-            $this->describeBuiltin($type, $property);
+            $this->describeBuiltin($type, $schema);
         }
     }
 
     /** Inlines dates and scalar classes, references a described model, and otherwise leaves a generic object */
-    public function describeClass(string $class, Schema $property, array $context): void
+    public function describeClass(string $class, Schema $schema, array $context): void
     {
         if (is_a($class, DateTimeInterface::class, true)) {
-            $this->describeDate($property, $context);
+            $this->describeDate($schema, $context);
             return;
         }
         if (isset(self::SCALAR_CLASSES[$class])) {
-            $property->type = self::SCALAR_CLASSES[$class];
+            $schema->type = self::SCALAR_CLASSES[$class];
             return;
         }
 
         $shapeContext = array_intersect_key($context, array_flip(self::SHAPE_KEYS));
         $model = new Model(Type::object($class), serializationContext: $shapeContext);
         if (!$this->isDescribable($model)) {
-            $property->type = 'object';
+            $schema->type = 'object';
             return;
         }
 
         $ref = $this->modelRegistry->register($model);
-        if ($property->nullable !== true) {
-            $property->ref = $ref;
+        if ($schema->nullable !== true) {
+            $schema->ref = $ref;
             return;
         }
         // OpenAPI 3.0 ignores siblings of $ref, so a nullable reference has to be wrapped
-        $property->oneOf = [new Schema(['ref' => $ref, '_context' => Util::createWeakContext($property->_context)])];
+        $schema->oneOf = [new Schema(['ref' => $ref, '_context' => Util::createWeakContext($schema->_context)])];
     }
 
     /** @param string[] $classes */
-    public function describeClasses(array $classes, Schema $property, array $context): void
+    public function describeClasses(array $classes, Schema $schema, array $context): void
     {
         if ($classes === []) {
-            $property->type = 'object';
+            $schema->type = 'object';
             return;
         }
         if (count($classes) === 1) {
-            $this->describeClass($classes[0], $property, $context);
+            $this->describeClass($classes[0], $schema, $context);
             return;
         }
 
-        $property->oneOf = array_map(function (string $class) use ($property, $context) {
-            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
-            $this->describeClass($class, $schema, $context);
-            return $schema;
+        $schema->oneOf = array_map(function (string $class) use ($schema, $context) {
+            $classSchema = new Schema(['_context' => Util::createWeakContext($schema->_context)]);
+            $this->describeClass($class, $classSchema, $context);
+            return $classSchema;
         }, $classes);
     }
 
     /** @param array<string, string> $types OpenAPI types by property name */
-    public function describeObject(Schema $schema, array $types, bool $nullable = true): void
+    public function describeObject(array $types, Schema $schema, bool $nullable = true): void
     {
         $schema->type = 'object';
         foreach ($types as $name => $type) {
@@ -167,34 +167,34 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
         }
     }
 
-    public function describeDate(Schema $property, array $context): void
+    public function describeDate(Schema $schema, array $context): void
     {
         $format = $context[HelperContextBuilder::DATE_FORMAT] ?? 'ISO8601';
-        $property->type = 'string';
+        $schema->type = 'string';
         if ($format === 'ISO8601') {
-            $property->format = 'date-time';
+            $schema->format = 'date-time';
             return;
         }
-        $property->description = "Date format: $format";
+        $schema->description = "Date format: $format";
     }
 
-    private function describeCollection(CollectionType $type, Schema $property, array $context): void
+    private function describeCollection(CollectionType $type, Schema $schema, array $context): void
     {
-        $property->type = 'array';
-        $property->items = new Items(['_context' => Util::createWeakContext($property->_context)]);
-        $this->describeType($type->getCollectionValueType(), $property->items, $context);
+        $schema->type = 'array';
+        $schema->items = new Items(['_context' => Util::createWeakContext($schema->_context)]);
+        $this->describeType($type->getCollectionValueType(), $schema->items, $context);
     }
 
-    private function describeUnion(UnionType $type, Schema $property, array $context): void
+    private function describeUnion(UnionType $type, Schema $schema, array $context): void
     {
-        $property->oneOf = array_map(function (Type $member) use ($property, $context) {
-            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
-            $this->describeType($member, $schema, $context);
-            return $schema;
+        $schema->oneOf = array_map(function (Type $member) use ($schema, $context) {
+            $memberSchema = new Schema(['_context' => Util::createWeakContext($schema->_context)]);
+            $this->describeType($member, $memberSchema, $context);
+            return $memberSchema;
         }, $type->getTypes());
     }
 
-    private function describeBuiltin(BuiltinType $type, Schema $property): void
+    private function describeBuiltin(BuiltinType $type, Schema $schema): void
     {
         $openApiType = match ($type->getTypeIdentifier()) {
             TypeIdentifier::STRING => 'string',
@@ -205,7 +205,7 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
             default => null,
         };
         if ($openApiType !== null) {
-            $property->type = $openApiType;
+            $schema->type = $openApiType;
         }
     }
 

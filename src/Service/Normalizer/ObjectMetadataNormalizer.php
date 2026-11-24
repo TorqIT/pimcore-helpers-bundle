@@ -41,7 +41,7 @@ class ObjectMetadataNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describer->describeObject($schema, ['object' => 'object'], nullable: false);
+        $this->describer->describeObject(['object' => 'object'], $schema, nullable: false);
         $schema->additionalProperties = true;
     }
 

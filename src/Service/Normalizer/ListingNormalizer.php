@@ -43,8 +43,8 @@ class ListingNormalizer implements DescribingNormalizerInterface
     public function describe(Model $model, Schema $schema): void
     {
         $this->describer->describeObject(
-            $schema,
             ['pageTotal' => 'integer', 'total' => 'integer'],
+            $schema,
             nullable: false,
         );
 

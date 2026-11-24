@@ -34,7 +34,7 @@ class NumericRangeNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describer->describeObject($schema, ['minimum' => 'number', 'maximum' => 'number']);
+        $this->describer->describeObject(['minimum' => 'number', 'maximum' => 'number'], $schema);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

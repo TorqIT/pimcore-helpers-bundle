@@ -38,11 +38,11 @@ class QuantityValueNormalizer implements DescribingNormalizerInterface
     {
         $isInput = is_a($model->getTypeInfo()->getClassName(), InputQuantityValue::class, true);
 
-        $this->describer->describeObject($schema, [
+        $this->describer->describeObject([
             'value' => $isInput ? 'string' : 'number',
             'unit' => 'string',
             'unitName' => 'string',
-        ]);
+        ], $schema);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

@@ -52,11 +52,11 @@ class VideoNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describer->describeObject($schema, [
+        $this->describer->describeObject([
             'title' => 'string',
             'description' => 'string',
             'type' => 'string',
-        ]);
+        ], $schema);
 
         $weakContext = Util::createWeakContext($schema->_context);
         $asset = new Schema(['_context' => $weakContext]);

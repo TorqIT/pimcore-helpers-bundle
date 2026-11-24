@@ -131,59 +131,59 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         );
     }
 
-    private function describeDefinition(FieldDef $definition, Schema $property, array $context): void
+    private function describeDefinition(FieldDef $definition, Schema $schema, array $context): void
     {
-        $property->nullable = true;
+        $schema->nullable = true;
         $fieldType = $definition->getFieldType();
         $relationsAsIds = $context[HelperContextBuilder::RELATIONS_AS_IDS] ?? false;
 
         if ($relationsAsIds && in_array($fieldType, self::RELATION_FIELDS)) {
-            $this->describeRelationIds($fieldType, $property);
+            $this->describeRelationIds($fieldType, $schema);
         } elseif ($fieldType === 'objectbricks') {
             /** @var FieldDef\Objectbricks $definition */
-            $this->describeBricks($definition, $property, $context);
+            $this->describeBricks($definition, $schema, $context);
         } elseif ($fieldType === 'fieldcollections') {
             /** @var FieldDef\Fieldcollections $definition */
-            $this->describeFieldCollections($definition, $property, $context);
+            $this->describeFieldCollections($definition, $schema, $context);
         } elseif ($fieldType === 'block') {
             /** @var FieldDef\Block $definition */
-            $this->describeBlock($definition, $property, $context);
+            $this->describeBlock($definition, $schema, $context);
         } elseif ($fieldType === 'advancedManyToManyObjectRelation') {
             /** @var FieldDef\AdvancedManyToManyObjectRelation $definition */
-            $this->describeAdvancedObjectRelation($definition, $property, $context);
+            $this->describeAdvancedObjectRelation($definition, $schema, $context);
         } elseif ($fieldType === 'advancedManyToManyRelation') {
             /** @var FieldDef\AdvancedManyToManyRelation $definition */
-            $this->describeAdvancedRelation($definition, $property, $context);
+            $this->describeAdvancedRelation($definition, $schema, $context);
         } elseif ($fieldType === 'encryptedField') {
             /** @var FieldDef\EncryptedField $definition */
-            $this->describeDefinition($definition->getDelegate(), $property, $context);
+            $this->describeDefinition($definition->getDelegate(), $schema, $context);
         } else {
-            $this->describePhpdocType($definition->getPhpdocReturnType(), $property, $context);
+            $this->describePhpdocType($definition->getPhpdocReturnType(), $schema, $context);
         }
     }
 
-    private function describeRelationIds(string $fieldType, Schema $property): void
+    private function describeRelationIds(string $fieldType, Schema $schema): void
     {
         if (in_array($fieldType, self::SINGLE_RELATION_FIELDS)) {
-            $property->type = 'integer';
+            $schema->type = 'integer';
             return;
         }
-        $property->type = 'array';
-        $property->items = new Items(['type' => 'integer', '_context' => Util::createWeakContext($property->_context)]);
+        $schema->type = 'array';
+        $schema->items = new Items(['type' => 'integer', '_context' => Util::createWeakContext($schema->_context)]);
     }
 
-    private function describeBricks(FieldDef\Objectbricks $definition, Schema $property, array $context): void
+    private function describeBricks(FieldDef\Objectbricks $definition, Schema $schema, array $context): void
     {
-        $property->type = 'object';
+        $schema->type = 'object';
         foreach ($definition->getAllowedTypes() as $type) {
-            $brick = Util::getProperty($property, $type);
+            $brick = Util::getProperty($schema, $type);
             $this->describer->describeClass(self::BRICK_NAMESPACE . $type, $brick, $context);
         }
     }
 
     private function describeFieldCollections(
         FieldDef\Fieldcollections $definition,
-        Schema $property,
+        Schema $schema,
         array $context,
     ): void {
         $classes = array_map(
@@ -191,18 +191,18 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
             $definition->getAllowedTypes(),
         );
 
-        $property->type = 'array';
-        $property->items = new Items(['_context' => Util::createWeakContext($property->_context)]);
-        $this->describer->describeClasses($classes, $property->items, $context);
+        $schema->type = 'array';
+        $schema->items = new Items(['_context' => Util::createWeakContext($schema->_context)]);
+        $this->describer->describeClasses($classes, $schema->items, $context);
     }
 
     /** Each block row maps a child field name to `{data: value}`, as BlockElementNormalizer outputs it */
-    private function describeBlock(FieldDef\Block $definition, Schema $property, array $context): void
+    private function describeBlock(FieldDef\Block $definition, Schema $schema, array $context): void
     {
-        $property->type = 'array';
-        $property->items = new Items(['type' => 'object', '_context' => Util::createWeakContext($property->_context)]);
+        $schema->type = 'array';
+        $schema->items = new Items(['type' => 'object', '_context' => Util::createWeakContext($schema->_context)]);
         foreach ($definition->getFieldDefinitions() as $name => $child) {
-            $element = Util::getProperty($property->items, $name);
+            $element = Util::getProperty($schema->items, $name);
             $element->type = 'object';
             $this->describeDefinition($child, Util::getProperty($element, 'data'), $context);
         }
@@ -210,23 +210,23 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
 
     private function describeAdvancedObjectRelation(
         FieldDef\AdvancedManyToManyObjectRelation $definition,
-        Schema $property,
+        Schema $schema,
         array $context,
     ): void {
         $className = ClassDefinition::getById($definition->getAllowedClassId())->getName();
         $classes = [self::DATA_OBJECT_NAMESPACE . ucfirst($className)];
 
-        $this->describeMetadataRows($property, 'object', $classes, $definition->getColumns(), $context);
+        $this->describeMetadataRows($schema, 'object', $classes, $definition->getColumns(), $context);
     }
 
     private function describeAdvancedRelation(
         FieldDef\AdvancedManyToManyRelation $definition,
-        Schema $property,
+        Schema $schema,
         array $context,
     ): void {
         $classes = $this->getAllowedElementClasses($definition);
 
-        $this->describeMetadataRows($property, 'element', $classes, $definition->getColumns(), $context);
+        $this->describeMetadataRows($schema, 'element', $classes, $definition->getColumns(), $context);
     }
 
     /** @return string[] empty when the allowed elements can't be narrowed to classes a normalizer describes */
@@ -258,26 +258,26 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
      * @param array<array{key: string}> $columns
      */
     private function describeMetadataRows(
-        Schema $property,
+        Schema $schema,
         string $elementKey,
         array $classes,
         array $columns,
         array $context,
     ): void {
-        $property->type = 'array';
-        $property->items = new Items(['type' => 'object', '_context' => Util::createWeakContext($property->_context)]);
-        $this->describer->describeClasses($classes, Util::getProperty($property->items, $elementKey), $context);
+        $schema->type = 'array';
+        $schema->items = new Items(['type' => 'object', '_context' => Util::createWeakContext($schema->_context)]);
+        $this->describer->describeClasses($classes, Util::getProperty($schema->items, $elementKey), $context);
         foreach ($columns as $column) {
-            $value = Util::getProperty($property->items, $column['key']);
+            $value = Util::getProperty($schema->items, $column['key']);
             $value->type = 'string';
             $value->nullable = true;
         }
     }
 
-    private function describePhpdocType(?string $phpdocType, Schema $property, array $context): void
+    private function describePhpdocType(?string $phpdocType, Schema $schema, array $context): void
     {
         if ($phpdocType !== null) {
-            $this->describer->describeType(TypeResolver::create()->resolve($phpdocType), $property, $context);
+            $this->describer->describeType(TypeResolver::create()->resolve($phpdocType), $schema, $context);
         }
     }
 
