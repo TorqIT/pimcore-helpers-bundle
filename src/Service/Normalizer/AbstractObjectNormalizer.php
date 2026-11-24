@@ -157,6 +157,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         if ($relationsAsIds && in_array($fieldType, self::RELATION_FIELDS)) {
             $this->describeRelationIds($fieldType, $property);
         } elseif ($fieldType === 'objectbricks') {
+            /** @var FieldDef\Objectbricks $definition */
             $this->describeBricks($definition, $property, $context);
         } elseif ($fieldType === 'fieldcollections') {
             /** @var FieldDef\Fieldcollections $definition */
@@ -182,8 +183,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         $property->items = new Items(['type' => 'integer', '_context' => Util::createWeakContext($property->_context)]);
     }
 
-    /** @param FieldDef\Objectbricks $definition */
-    private function describeBricks(FieldDef $definition, Schema $property, array $context): void
+    private function describeBricks(FieldDef\Objectbricks $definition, Schema $property, array $context): void
     {
         $property->type = 'object';
         foreach ($definition->getAllowedTypes() as $type) {
