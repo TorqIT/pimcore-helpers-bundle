@@ -87,7 +87,7 @@ class DataObjectNormalizer extends AbstractObjectNormalizer
         }
 
         // Variants share their parent's class, so they reference this same model
-        $this->describeModel(
+        $this->describer->describeClass(
             $model->getTypeInfo()->getClassName(),
             $children->items,
             $model->getSerializationContext(),

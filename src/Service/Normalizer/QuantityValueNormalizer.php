@@ -9,12 +9,17 @@ use Pimcore\Model\DataObject\Data\InputQuantityValue;
 use Pimcore\Model\DataObject\Data\QuantityValue;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.quantity_value', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class QuantityValueNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
+
+    public function __construct(
+        protected PimcoreModelDescriber $describer,
+    ) {}
 
     /* @param QuantityValue|InputQuantityValue $data */
     public function normalize(
@@ -33,7 +38,7 @@ class QuantityValueNormalizer implements DescribingNormalizerInterface
     {
         $isInput = is_a($model->getTypeInfo()->getClassName(), InputQuantityValue::class, true);
 
-        $this->describeProperties($schema, [
+        $this->describer->describeObject($schema, [
             'value' => $isInput ? 'string' : 'number',
             'unit' => 'string',
             'unitName' => 'string',

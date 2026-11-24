@@ -10,15 +10,17 @@ use OpenApi\Annotations\Schema;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.carbon_period', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class CarbonPeriodNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
 
     public function __construct(
         #[Autowire(service: 'torq.normalizer.carbon')] private CarbonNormalizer $carbonNormalizer,
+        protected PimcoreModelDescriber $describer,
     )
     {
     }
@@ -39,7 +41,7 @@ class CarbonPeriodNormalizer implements DescribingNormalizerInterface
     {
         $schema->type = 'object';
         foreach (['startDate', 'endDate'] as $name) {
-            $this->describeDate(Util::getProperty($schema, $name), $model->getSerializationContext());
+            $this->describer->describeDate(Util::getProperty($schema, $name), $model->getSerializationContext());
         }
     }
 

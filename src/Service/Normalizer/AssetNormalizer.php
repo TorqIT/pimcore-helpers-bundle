@@ -15,19 +15,21 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Torq\PimcoreHelpersBundle\Model\Asset\AssetMetadata;
 use Torq\PimcoreHelpersBundle\Repository\AssetMetadataRepository;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
 #[AsAlias('torq.normalizer.asset', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -2]])]
 class AssetNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
 
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
         protected ArrayUtils $utils,
         protected AssetMetadataRepository $metadataRepository,
-        protected RequestStack $requestStack
+        protected RequestStack $requestStack,
+        protected PimcoreModelDescriber $describer,
     ) {
     }
 
@@ -51,7 +53,7 @@ class AssetNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describeProperties($schema, [
+        $this->describer->describeObject($schema, [
             'id' => 'integer',
             'fullPath' => 'string',
             'fileName' => 'string',

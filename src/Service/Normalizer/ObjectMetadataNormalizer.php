@@ -11,15 +11,17 @@ use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.object_metadata', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class ObjectMetadataNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
 
     public function __construct(
-        #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface $normalizer
+        #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface $normalizer,
+        protected PimcoreModelDescriber $describer,
     ) {
     }
 
@@ -39,7 +41,7 @@ class ObjectMetadataNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describeProperties($schema, ['object' => 'object'], nullable: false);
+        $this->describer->describeObject($schema, ['object' => 'object'], nullable: false);
         $schema->additionalProperties = true;
     }
 

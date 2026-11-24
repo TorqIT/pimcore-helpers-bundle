@@ -8,12 +8,17 @@ use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\Data\NumericRange;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.numeric_range', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class NumericRangeNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
+
+    public function __construct(
+        protected PimcoreModelDescriber $describer,
+    ) {}
 
     /* @param NumericRange $data */
     public function normalize(
@@ -29,7 +34,7 @@ class NumericRangeNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describeProperties($schema, ['minimum' => 'number', 'maximum' => 'number']);
+        $this->describer->describeObject($schema, ['minimum' => 'number', 'maximum' => 'number']);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool

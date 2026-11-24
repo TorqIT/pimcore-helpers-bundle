@@ -13,15 +13,17 @@ use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.listing', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class ListingNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
 
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] private NormalizerInterface $normalizer,
+        protected PimcoreModelDescriber $describer,
     ) {
     }
 
@@ -40,12 +42,16 @@ class ListingNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describeProperties($schema, ['pageTotal' => 'integer', 'total' => 'integer'], nullable: false);
+        $this->describer->describeObject(
+            $schema,
+            ['pageTotal' => 'integer', 'total' => 'integer'],
+            nullable: false,
+        );
 
         $data = Util::getProperty($schema, 'data');
         $data->type = 'array';
         $data->items = new Items(['_context' => Util::createWeakContext($data->_context)]);
-        $this->describeModel(
+        $this->describer->describeClass(
             $this->getItemClass($model->getTypeInfo()->getClassName()),
             $data->items,
             $model->getSerializationContext(),

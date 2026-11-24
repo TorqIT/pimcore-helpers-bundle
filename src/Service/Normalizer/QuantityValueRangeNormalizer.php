@@ -8,12 +8,17 @@ use OpenApi\Annotations\Schema;
 use Pimcore\Model\DataObject\Data\QuantityValueRange;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.quantity_value_range', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class QuantityValueRangeNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
+
+    public function __construct(
+        protected PimcoreModelDescriber $describer,
+    ) {}
 
     /* @param QuantityValueRange $data */
     public function normalize(
@@ -31,7 +36,7 @@ class QuantityValueRangeNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describeProperties($schema, [
+        $this->describer->describeObject($schema, [
             'minimum' => 'number',
             'maximum' => 'number',
             'unit' => 'string',

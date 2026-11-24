@@ -9,15 +9,18 @@ use Pimcore\Model\DataObject\Data\Hotspotimage;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.hotspot_image', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class HotspotImageNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
 
-    public function __construct(#[Autowire(service: 'torq.normalizer.image')] private ImageNormalizer $imageNormalizer)
-    {
+    public function __construct(
+        #[Autowire(service: 'torq.normalizer.image')] private ImageNormalizer $imageNormalizer,
+        protected PimcoreModelDescriber $describer,
+    ) {
     }
 
     /* @param Hotspotimage $data */

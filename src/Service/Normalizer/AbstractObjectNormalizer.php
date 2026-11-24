@@ -3,7 +3,6 @@
 namespace Torq\PimcoreHelpersBundle\Service\Normalizer;
 
 use ArrayObject;
-use DateTimeInterface;
 use Nelmio\ApiDocBundle\Model\Model;
 use Nelmio\ApiDocBundle\OpenApiPhp\Util;
 use OpenApi\Annotations\Items;
@@ -11,43 +10,23 @@ use OpenApi\Annotations\Schema;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\ClassDefinition;
 use Pimcore\Model\DataObject\ClassDefinition\Data as FieldDef;
-use Pimcore\Model\DataObject\Data\Consent;
-use Pimcore\Model\DataObject\Data\ExternalImage;
-use Pimcore\Model\DataObject\Data\Link;
-use Pimcore\Model\DataObject\Data\RgbaColor;
-use Pimcore\Model\DataObject\Data\UrlSlug;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\NullableType;
-use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\UnionType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Service\Common\FieldFetcher;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
 abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
     use RelationsAsIdsTrait;
 
     private const string DATA_OBJECT_NAMESPACE = 'Pimcore\\Model\\DataObject\\';
     private const string BRICK_NAMESPACE = 'Pimcore\\Model\\DataObject\\Objectbrick\\Data\\';
     private const string FIELD_COLLECTION_NAMESPACE = 'Pimcore\\Model\\DataObject\\Fieldcollection\\Data\\';
-
-    /** Value classes whose normalizers output a scalar */
-    private const array SCALAR_CLASSES = [
-        Link::class => 'string',
-        UrlSlug::class => 'string',
-        ExternalImage::class => 'string',
-        RgbaColor::class => 'string',
-        Consent::class => 'boolean',
-    ];
 
     private const array SINGLE_RELATION_FIELDS = ['manyToOneRelation', 'image', 'hotspotimage', 'video'];
 
@@ -55,6 +34,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
         protected ArrayUtils $utils,
         protected FieldFetcher $fieldFetcher,
+        protected PimcoreModelDescriber $describer,
     ) {}
 
     public function normalize(
@@ -196,7 +176,8 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
     {
         $property->type = 'object';
         foreach ($definition->getAllowedTypes() as $type) {
-            $this->describeClass(self::BRICK_NAMESPACE . $type, Util::getProperty($property, $type), $context);
+            $brick = Util::getProperty($property, $type);
+            $this->describer->describeClass(self::BRICK_NAMESPACE . $type, $brick, $context);
         }
     }
 
@@ -212,7 +193,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
 
         $property->type = 'array';
         $property->items = new Items(['_context' => Util::createWeakContext($property->_context)]);
-        $this->describeClasses($classes, $property->items, $context);
+        $this->describer->describeClasses($classes, $property->items, $context);
     }
 
     /** Each block row maps a child field name to `{data: value}`, as BlockElementNormalizer outputs it */
@@ -285,7 +266,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
     ): void {
         $property->type = 'array';
         $property->items = new Items(['type' => 'object', '_context' => Util::createWeakContext($property->_context)]);
-        $this->describeClasses($classes, Util::getProperty($property->items, $elementKey), $context);
+        $this->describer->describeClasses($classes, Util::getProperty($property->items, $elementKey), $context);
         foreach ($columns as $column) {
             $value = Util::getProperty($property->items, $column['key']);
             $value->type = 'string';
@@ -293,91 +274,11 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         }
     }
 
-    /** @param string[] $classes */
-    private function describeClasses(array $classes, Schema $property, array $context): void
-    {
-        if ($classes === []) {
-            $property->type = 'object';
-            return;
-        }
-        if (count($classes) === 1) {
-            $this->describeClass($classes[0], $property, $context);
-            return;
-        }
-
-        $property->oneOf = array_map(function (string $class) use ($property, $context) {
-            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
-            $this->describeClass($class, $schema, $context);
-            return $schema;
-        }, $classes);
-    }
-
     private function describePhpdocType(?string $phpdocType, Schema $property, array $context): void
     {
         if ($phpdocType !== null) {
-            $this->describeType(TypeResolver::create()->resolve($phpdocType), $property, $context);
+            $this->describer->describeType(TypeResolver::create()->resolve($phpdocType), $property, $context);
         }
-    }
-
-    private function describeType(Type $type, Schema $property, array $context): void
-    {
-        match (true) {
-            $type instanceof NullableType => $this->describeType($type->getWrappedType(), $property, $context),
-            $type instanceof CollectionType => $this->describeCollection($type, $property, $context),
-            $type instanceof UnionType => $this->describeUnion($type, $property, $context),
-            $type instanceof ObjectType => $this->describeClass(
-                ltrim($type->getClassName(), '\\'),
-                $property,
-                $context,
-            ),
-            $type instanceof BuiltinType => $this->describeBuiltin($type, $property),
-            default => null,
-        };
-    }
-
-    private function describeCollection(CollectionType $type, Schema $property, array $context): void
-    {
-        $property->type = 'array';
-        $property->items = new Items(['_context' => Util::createWeakContext($property->_context)]);
-        $this->describeType($type->getCollectionValueType(), $property->items, $context);
-    }
-
-    private function describeUnion(UnionType $type, Schema $property, array $context): void
-    {
-        $property->oneOf = array_map(function (Type $member) use ($property, $context) {
-            $schema = new Schema(['_context' => Util::createWeakContext($property->_context)]);
-            $this->describeType($member, $schema, $context);
-            return $schema;
-        }, $type->getTypes());
-    }
-
-    private function describeBuiltin(BuiltinType $type, Schema $property): void
-    {
-        $openApiType = match ($type->getTypeIdentifier()) {
-            TypeIdentifier::STRING => 'string',
-            TypeIdentifier::INT => 'integer',
-            TypeIdentifier::FLOAT => 'number',
-            TypeIdentifier::BOOL => 'boolean',
-            TypeIdentifier::ARRAY => 'array',
-            default => null,
-        };
-        if ($openApiType !== null) {
-            $property->type = $openApiType;
-        }
-    }
-
-    private function describeClass(string $class, Schema $property, array $context): void
-    {
-        if (is_a($class, DateTimeInterface::class, true)) {
-            $this->describeDate($property, $context);
-            return;
-        }
-        if (isset(self::SCALAR_CLASSES[$class])) {
-            $property->type = self::SCALAR_CLASSES[$class];
-            return;
-        }
-
-        $this->describeModel($class, $property, $context);
     }
 
     abstract public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool;

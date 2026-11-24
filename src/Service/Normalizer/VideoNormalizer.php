@@ -11,15 +11,18 @@ use Pimcore\Model\DataObject\Data\Video;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Torq\PimcoreHelpersBundle\Service\Describer\PimcoreModelDescriber;
 
 #[AsAlias('torq.normalizer.video', public: true)]
 #[Autoconfigure(tags: [['name' => 'serializer.normalizer', 'priority' => -1]])]
 class VideoNormalizer implements DescribingNormalizerInterface
 {
-    use DescribingNormalizerTrait;
+    use PimcoreModelSupportTrait;
 
-    public function __construct(#[Autowire(service: 'torq.normalizer.asset')] private AssetNormalizer $assetNormalizer)
-    {
+    public function __construct(
+        #[Autowire(service: 'torq.normalizer.asset')] private AssetNormalizer $assetNormalizer,
+        protected PimcoreModelDescriber $describer,
+    ) {
     }
 
     /* @param Video $data */
@@ -49,11 +52,15 @@ class VideoNormalizer implements DescribingNormalizerInterface
 
     public function describe(Model $model, Schema $schema): void
     {
-        $this->describeProperties($schema, ['title' => 'string', 'description' => 'string', 'type' => 'string']);
+        $this->describer->describeObject($schema, [
+            'title' => 'string',
+            'description' => 'string',
+            'type' => 'string',
+        ]);
 
         $weakContext = Util::createWeakContext($schema->_context);
         $asset = new Schema(['_context' => $weakContext]);
-        $this->describeModel(Asset::class, $asset, $model->getSerializationContext());
+        $this->describer->describeClass(Asset::class, $asset, $model->getSerializationContext());
 
         $data = Util::getProperty($schema, 'data');
         $data->nullable = true;
