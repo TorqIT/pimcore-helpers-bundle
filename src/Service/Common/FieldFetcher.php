@@ -150,10 +150,10 @@ class FieldFetcher
         return $this->getFieldDefinition($object, $field)?->getFieldType();
     }
 
-    private function toObject(DataObject|FCData|BrickData|string $object): DataObject|FCData|BrickData
+    public function toObject(DataObject|FCData|BrickData|string $object): DataObject|FCData|BrickData
     {
         if (is_string($object)) {
-            $object = new ReflectionClass($object)->newInstanceWithoutConstructor();
+            $object = (new ReflectionClass($object))->newInstanceWithoutConstructor();
             if (!($object instanceof DataObject) && !($object instanceof FCData) && !($object instanceof BrickData)) {
                 throw new InvalidArgumentException('Unsupported class for object: ' . $object::class);
             }
@@ -192,7 +192,7 @@ class FieldFetcher
 
     private function getFieldsFromFieldConsts(string $class)
     {
-        $constants = new ReflectionClass($class)->getConstants(ReflectionClassConstant::IS_PUBLIC);
+        $constants = (new ReflectionClass($class))->getConstants(ReflectionClassConstant::IS_PUBLIC);
         $fields = array_filter($constants, fn(string $key) => str_starts_with($key, 'FIELD'), ARRAY_FILTER_USE_KEY);
         return array_values($fields);
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Torq\PimcoreHelpersBundle\Service\Describer;
 
 use DateTimeInterface;
+use LogicException;
 use Nelmio\ApiDocBundle\Describer\ModelRegistryAwareInterface;
 use Nelmio\ApiDocBundle\Describer\ModelRegistryAwareTrait;
 use Nelmio\ApiDocBundle\Model\Model;
@@ -28,6 +29,7 @@ use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Torq\PimcoreHelpersBundle\Model\Common\HelperContextBuilder;
 use Torq\PimcoreHelpersBundle\Service\Normalizer\DescribingNormalizerInterface;
+use Torq\PimcoreHelpersBundle\Service\Utility\ArrayUtils;
 
 /**
  * What describing normalizers delegate to when describing a type which isn't their own.
@@ -65,6 +67,7 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
     /** @param iterable<DescribingNormalizerInterface> $describingNormalizers */
     public function __construct(
         #[AutowireIterator(DescribingNormalizerInterface::TAG)] private iterable $describingNormalizers,
+        private ArrayUtils $utils,
     ) {}
 
     public function supports(Model $model): bool
@@ -72,7 +75,12 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
         return false;
     }
 
-    public function describe(Model $model, Schema $schema): void {}
+    public function describe(Model $model, Schema $schema): void
+    {
+        throw new LogicException(
+            self::class . ' supports no models; it is only registered to receive the model registry.',
+        );
+    }
 
     /** A normalizer for the exact class describes it ahead of one which only supports a parent class */
     public function isSupportedBy(DescribingNormalizerInterface $normalizer, Model $model): bool
@@ -88,7 +96,7 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
             return true;
         }
 
-        return array_any($supportedClasses, fn(string $supported) => is_a($class, $supported, true)) &&
+        return $this->utils->any($supportedClasses, fn(string $supported) => is_a($class, $supported, true)) &&
             !$this->isSupportedExactly($class);
     }
 
@@ -211,7 +219,7 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
 
     private function isDescribable(Model $model): bool
     {
-        return array_any(
+        return $this->utils->any(
             [...$this->describingNormalizers],
             fn(DescribingNormalizerInterface $normalizer) => $normalizer->supports($model),
         );
@@ -219,7 +227,7 @@ class PimcoreModelDescriber implements ModelDescriberInterface, ModelRegistryAwa
 
     private function isSupportedExactly(string $class): bool
     {
-        return array_any(
+        return $this->utils->any(
             [...$this->describingNormalizers],
             fn(DescribingNormalizerInterface $normalizer) => in_array(
                 $class,

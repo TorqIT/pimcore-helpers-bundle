@@ -10,6 +10,7 @@ use OpenApi\Annotations\Schema;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\ClassDefinition;
 use Pimcore\Model\DataObject\ClassDefinition\Data as FieldDef;
+use Pimcore\Model\DataObject\Data\Video;
 use stdClass;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -28,7 +29,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
     private const string BRICK_NAMESPACE = 'Pimcore\\Model\\DataObject\\Objectbrick\\Data\\';
     private const string FIELD_COLLECTION_NAMESPACE = 'Pimcore\\Model\\DataObject\\Fieldcollection\\Data\\';
 
-    private const array SINGLE_RELATION_FIELDS = ['manyToOneRelation', 'image', 'hotspotimage', 'video'];
+    private const array SINGLE_RELATION_FIELDS = ['manyToOneRelation', 'image', 'hotspotimage'];
 
     public function __construct(
         #[Autowire(service: 'serializer.normalizer.object')] protected NormalizerInterface $normalizer,
@@ -50,12 +51,12 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
     public function describe(Model $model, Schema $schema): void
     {
         $context = $this->getDefaultContext($model->getSerializationContext());
-        $class = $model->getTypeInfo()->getClassName();
+        $object = $this->fieldFetcher->toObject($model->getTypeInfo()->getClassName());
 
         $schema->type = 'object';
-        foreach ($this->getFields($class, $context) as $field) {
+        foreach ($this->getFields($object, $context) as $field) {
             $property = Util::getProperty($schema, $field);
-            $definition = $this->fieldFetcher->getFieldDefinition($class, $field);
+            $definition = $this->fieldFetcher->getFieldDefinition($object, $field);
 
             if ($definition) {
                 $this->describeDefinition($definition, $property, $context);
@@ -119,7 +120,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
     }
 
     /* @return string[] */
-    private function getFields(object|string $data, array $context = []): array
+    private function getFields(object $data, array $context = []): array
     {
         return $this->fieldFetcher->getFields(
             $data,
@@ -138,7 +139,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         $relationsAsIds = $context[HelperContextBuilder::RELATIONS_AS_IDS] ?? false;
 
         if ($relationsAsIds && in_array($fieldType, self::RELATION_FIELDS)) {
-            $this->describeRelationIds($fieldType, $schema);
+            $this->describeRelationIds($fieldType, $schema, $context);
         } elseif ($fieldType === 'objectbricks') {
             /** @var FieldDef\Objectbricks $definition */
             $this->describeBricks($definition, $schema, $context);
@@ -162,14 +163,28 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         }
     }
 
-    private function describeRelationIds(string $fieldType, Schema $schema): void
+    private function describeRelationIds(string $fieldType, Schema $schema, array $context): void
     {
         if (in_array($fieldType, self::SINGLE_RELATION_FIELDS)) {
             $schema->type = 'integer';
             return;
         }
+        if ($fieldType === 'video') {
+            $this->describeVideo($schema, $context);
+            return;
+        }
         $schema->type = 'array';
         $schema->items = new Items(['type' => 'integer', '_context' => Util::createWeakContext($schema->_context)]);
+    }
+
+    /** Only a video backed by an asset is swapped for its ID; any other video is normalized in full */
+    private function describeVideo(Schema $schema, array $context): void
+    {
+        $weakContext = Util::createWeakContext($schema->_context);
+        $video = new Schema(['_context' => $weakContext]);
+        $this->describer->describeClass(Video::class, $video, $context);
+
+        $schema->oneOf = [new Schema(['type' => 'integer', '_context' => $weakContext]), $video];
     }
 
     private function describeBricks(FieldDef\Objectbricks $definition, Schema $schema, array $context): void
@@ -177,7 +192,7 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         $schema->type = 'object';
         foreach ($definition->getAllowedTypes() as $type) {
             $brick = Util::getProperty($schema, $type);
-            $this->describer->describeClass(self::BRICK_NAMESPACE . $type, $brick, $context);
+            $this->describer->describeClass(self::BRICK_NAMESPACE . ucfirst($type), $brick, $context);
         }
     }
 
@@ -213,8 +228,8 @@ abstract class AbstractObjectNormalizer implements DescribingNormalizerInterface
         Schema $schema,
         array $context,
     ): void {
-        $className = ClassDefinition::getById($definition->getAllowedClassId())->getName();
-        $classes = [self::DATA_OBJECT_NAMESPACE . ucfirst($className)];
+        $className = ClassDefinition::getById((string) $definition->getAllowedClassId())?->getName();
+        $classes = $className ? [self::DATA_OBJECT_NAMESPACE . ucfirst($className)] : [];
 
         $this->describeMetadataRows($schema, 'object', $classes, $definition->getColumns(), $context);
     }
